@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import quotesData from './data/quotes.json';
@@ -6,28 +6,66 @@ import quotesData from './data/quotes.json';
 function App() {
   const [quote, setQuote] = useState({ text: "", author: "" });
   const [isVisible, setIsVisible] = useState(false);
+  const [normalDeck, setNormalDeck] = useState([]);
+  const [specialDeck, setSpecialDeck] = useState([]);
+
+  // Helper to shuffle an array
+  const shuffleArray = (array) => {
+    let result = [...array];
+    for (let i = result.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [result[i], result[j]] = [result[j], result[i]];
+    }
+    return result;
+  };
+
+  // Initialize and get the first quote
+  const getNextQuote = (isSpecial) => {
+    let nextQuote = null;
+
+    if (isSpecial) {
+      setSpecialDeck(prev => {
+        let deck = prev.length > 0 ? prev : shuffleArray(quotesData.filter(q => q.special));
+        nextQuote = deck[0];
+        return deck.slice(1);
+      });
+    } else {
+      setNormalDeck(prev => {
+        let deck = prev.length > 0 ? prev : shuffleArray(quotesData.filter(q => !q.special));
+        nextQuote = deck[0];
+        return deck.slice(1);
+      });
+    }
+
+    return nextQuote;
+  };
 
   useEffect(() => {
-    getRandomQuote(false);
+    // Initial load: Prepare normal deck and get first quote
+    const initialNormalQuotes = quotesData.filter(q => !q.special);
+    const initialSpecialQuotes = quotesData.filter(q => q.special);
+
+    const shuffledNormal = shuffleArray(initialNormalQuotes);
+    const shuffledSpecial = shuffleArray(initialSpecialQuotes);
+
+    setQuote(shuffledNormal[0]);
+    setNormalDeck(shuffledNormal.slice(1));
+    setSpecialDeck(shuffledSpecial);
+
     setIsVisible(true);
   }, []);
-
-  const getRandomQuote = (isSpecial) => {
-    const filteredQuotes = quotesData.filter(q => q.special === isSpecial);
-    const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
-    setQuote(filteredQuotes[randomIndex]);
-  };
 
   const handleRefresh = (isSpecial) => {
     if (isSpecial) {
       triggerConfetti();
       window.location.href = 'tel:0628632916';
-      return; // Exit early, don't change the quote
+      return;
     }
 
     setIsVisible(false);
     setTimeout(() => {
-      getRandomQuote(false);
+      const next = getNextQuote(false);
+      setQuote(next);
       setIsVisible(true);
     }, 300);
   };
@@ -67,7 +105,6 @@ function App() {
 
   return (
     <div className="app-container">
-      {/* Dynamic background elements */}
       <div className="blob"></div>
       <div className="blob blob-2"></div>
       <div className="blob blob-3"></div>
