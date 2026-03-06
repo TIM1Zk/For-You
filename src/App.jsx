@@ -19,16 +19,15 @@ function App() {
   };
 
   const handleRefresh = (isSpecial) => {
-    setIsVisible(false);
-
     if (isSpecial) {
       triggerConfetti();
-      // Trigger phone call
       window.location.href = 'tel:0628632916';
+      return; // Exit early, don't change the quote
     }
 
+    setIsVisible(false);
     setTimeout(() => {
-      getRandomQuote(isSpecial);
+      getRandomQuote(false);
       setIsVisible(true);
     }, 300);
   };

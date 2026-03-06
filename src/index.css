@@ -194,3 +194,59 @@ body {
   opacity: 1;
   transition: opacity 300ms ease-out;
 }
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .quote-card {
+    padding: 2rem;
+    margin: 10px;
+  }
+
+  .quote-text {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .blob {
+    width: 200px;
+    height: 200px;
+    filter: blur(60px);
+  }
+
+  .blob-2 {
+    width: 250px;
+    height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .quote-card {
+    padding: 1.5rem;
+    border-radius: 20px;
+  }
+
+  .quote-text {
+    font-size: 1.1rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .button-group {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .btn-special {
+    margin-left: 0;
+  }
+
+  .btn-primary,
+  .btn-special {
+    width: 100%;
+    padding: 10px 20px;
+  }
+
+  .quote-author {
+    font-size: 0.8rem;
+    margin-bottom: 1.5rem;
+  }
+}
