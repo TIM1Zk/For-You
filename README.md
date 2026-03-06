@@ -1,16 +1,60 @@
-# React + Vite
+# ✨ For You - Encouraging Study Partner Website
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A minimalist, premium, and heartfelt web application built to provide encouragement and motivation for a special someone during their study sessions or hard-working days.
 
-Currently, two official plugins are available:
+## 🌟 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **🎨 "Less is More" Aesthetic**: Clean glassmorphism design with soft, dynamic background elements for a calm and focused atmosphere.
+- **💌 Randomized Encouragement**: A curated collection of meaningful quotes in both **Thai** and **English**, specifically focused on study and perseverance.
+- **💖 Special Encouragement Mode**: A dedicated "Special" button that triggers:
+  - A beautiful **Heart Confetti Explosion** ❤️
+  - Deeply emotional and sweet personal messages.
+  - An **Automatic Call Trigger** to bridge the distance instantly.
+- **✨ Smooth Interactions**: Fluid transitions and micro-animations powered by Framer Motion.
+- **📱 Responsive Design**: Optimized for a premium experience on both Desktop and Mobile devices.
 
-## React Compiler
+## 🛠️ Technology Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Framework**: [React](https://reactjs.org/) (Vite)
+- **Animations**: [Framer Motion](https://www.framer.com/motion/)
+- **Effects**: [Canvas Confetti](https://www.npmjs.com/package/canvas-confetti)
+- **Styling**: Vanilla CSS with Modern Glassmorphism
+- **Typography**: Google Fonts (Inter, Mitr, Sarabun)
 
-## Expanding the ESLint configuration
+## 🚀 Getting Started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Prerequisites
+
+- Node.js (v18 or higher)
+- npm or yarn
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/TIM1Zk/For-You.git
+   cd For-You
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Run the development server**
+   ```bash
+   npm run dev
+   ```
+
+4. **Open in Browser**
+   Navigate to `http://localhost:5173` to see the magic.
+
+## 📂 Project Structure
+
+- `src/App.jsx`: Main logic, state management, and animations.
+- `src/index.css`: Core design system and glassmorphism styling.
+- `src/data/quotes.json`: The database of heart-warming quotes.
+
+---
+
+Built with ❤️ for someone special by [TIM1Zk](https://github.com/TIM1Zk).

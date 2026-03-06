@@ -114,7 +114,7 @@ function App() {
         color: '#aaa',
         letterSpacing: '1px'
       }}>
-        WITH LOVE • 2026
+        WITH LOVE • MADE BY TIM1Zk • 2026
       </footer>
     </div>
   );
