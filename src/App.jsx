@@ -21,20 +21,17 @@ function App() {
 
   // Initialize and get the first quote
   const getNextQuote = (isSpecial) => {
-    let nextQuote = null;
+    const deck = isSpecial ? specialDeck : normalDeck;
+    const filtered = quotesData.filter(q => q.special === isSpecial);
+
+    const currentDeck = deck.length > 0 ? deck : shuffleArray(filtered);
+    const nextQuote = currentDeck[0];
+    const remaining = currentDeck.slice(1);
 
     if (isSpecial) {
-      setSpecialDeck(prev => {
-        let deck = prev.length > 0 ? prev : shuffleArray(quotesData.filter(q => q.special));
-        nextQuote = deck[0];
-        return deck.slice(1);
-      });
+      setSpecialDeck(remaining);
     } else {
-      setNormalDeck(prev => {
-        let deck = prev.length > 0 ? prev : shuffleArray(quotesData.filter(q => !q.special));
-        nextQuote = deck[0];
-        return deck.slice(1);
-      });
+      setNormalDeck(remaining);
     }
 
     return nextQuote;
