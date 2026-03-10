@@ -269,6 +269,10 @@ function App() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
+          {/* Decorative Blobs for Gallery Background */}
+          <div className="blob" style={{ opacity: 0.5 }}></div>
+          <div className="blob blob-2" style={{ opacity: 0.5 }}></div>
+
           <div className="gallery-header">
             <h2>Gallery ความน่ารัก ✨</h2>
             <button className="btn-back" onClick={() => setCurrentPage('home')}>กลับ</button>
