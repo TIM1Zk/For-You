@@ -2,12 +2,22 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import quotesData from './data/quotes.json';
+import { Camera, Trash2, Send, Clock, User } from 'lucide-react';
+
 
 function App() {
   const [quote, setQuote] = useState({ text: "", author: "" });
   const [isVisible, setIsVisible] = useState(false);
   const [normalDeck, setNormalDeck] = useState([]);
   const [specialDeck, setSpecialDeck] = useState([]);
+  const [images, setImages] = useState(() => {
+    const saved = localStorage.getItem('cute_images');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [newImage, setNewImage] = useState(null);
+  const [imageName, setImageName] = useState("");
+  const [showUpload, setShowUpload] = useState(false);
+
 
   // Helper to shuffle an array
   const shuffleArray = (array) => {
@@ -51,6 +61,49 @@ function App() {
 
     setIsVisible(true);
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem('cute_images', JSON.stringify(images));
+  }, [images]);
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNewImage(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const saveImage = () => {
+    if (!newImage || !imageName.trim()) return;
+
+    const imgObj = {
+      id: Date.now(),
+      url: newImage,
+      name: imageName,
+      timestamp: new Date().toLocaleString('th-TH', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    };
+
+    setImages([imgObj, ...images]);
+    setNewImage(null);
+    setImageName("");
+    setShowUpload(false);
+    triggerConfetti();
+  };
+
+  const deleteImage = (id) => {
+    setImages(images.filter(img => img.id !== id));
+  };
+
 
   const handleRefresh = (isSpecial) => {
     if (isSpecial) {
@@ -107,7 +160,7 @@ function App() {
       <div className="blob blob-3"></div>
 
       <AnimatePresence mode="wait">
-        {isVisible && (
+        {isVisible && !showUpload && (
           <motion.div
             key={quote.text}
             className="quote-card"
@@ -136,9 +189,94 @@ function App() {
                 กำลังใจพิเศษ ❤️
               </button>
             </div>
+
+            <button
+              className="btn-upload-toggle"
+              onClick={() => setShowUpload(true)}
+            >
+              <Camera size={18} /> อัพโหลดความน่ารัก
+            </button>
+          </motion.div>
+        )}
+
+        {showUpload && (
+          <motion.div
+            className="quote-card upload-card"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+          >
+            <h2 className="upload-title">เพิ่มความน่ารัก ✨</h2>
+
+            <div className="upload-area">
+              {!newImage ? (
+                <label className="file-label">
+                  <input type="file" accept="image/*" onChange={handleImageUpload} hidden />
+                  <div className="upload-placeholder">
+                    <Camera size={40} />
+                    <span>เลือกรูปภาพน่ารักๆ</span>
+                  </div>
+                </label>
+              ) : (
+                <div className="preview-container">
+                  <img src={newImage} alt="Preview" className="upload-preview" />
+                  <button className="btn-remove-preview" onClick={() => setNewImage(null)}>
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div className="input-group">
+              <input
+                type="text"
+                placeholder="ตั้งชื่อภาพนี้ว่าอะไรดี..."
+                value={imageName}
+                onChange={(e) => setImageName(e.target.value)}
+                className="name-input"
+              />
+            </div>
+
+            <div className="button-group">
+              <button className="btn-secondary" onClick={() => setShowUpload(false)}>
+                ยกเลิก
+              </button>
+              <button
+                className="btn-save"
+                onClick={saveImage}
+                disabled={!newImage || !imageName.trim()}
+              >
+                <Send size={18} /> บันทึกเลย!
+              </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      <div className="gallery-container">
+        <AnimatePresence>
+          {images.map((img) => (
+            <motion.div
+              key={img.id}
+              className="gallery-item"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              layout
+            >
+              <img src={img.url} alt={img.name} className="gallery-img" />
+              <div className="gallery-info">
+                <p className="img-name"><User size={12} /> {img.name}</p>
+                <p className="img-time"><Clock size={12} /> {img.timestamp}</p>
+                <button className="btn-delete" onClick={() => deleteImage(img.id)}>
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+
 
       <footer style={{
         position: 'absolute',
