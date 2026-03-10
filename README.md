@@ -10,6 +10,7 @@ A minimalist, premium, and heartfelt web application built to provide encouragem
   - A beautiful **Heart Confetti Explosion** ❤️
   - Deeply emotional and sweet personal messages.
   - An **Automatic Call Trigger** to bridge the distance instantly.
+- **📸 Cute Gallery & Upload**: Users can upload their own cute images which are saved locally. Features a responsive masonry grid layout to view all uploaded memories.
 - **✨ Smooth Interactions**: Fluid transitions and micro-animations powered by Framer Motion.
 - **📱 Responsive Design**: Optimized for a premium experience on both Desktop and Mobile devices.
 
@@ -17,9 +18,11 @@ A minimalist, premium, and heartfelt web application built to provide encouragem
 
 - **Framework**: [React](https://reactjs.org/) (Vite)
 - **Animations**: [Framer Motion](https://www.framer.com/motion/)
+- **Icons**: [Lucide React](https://lucide.dev/)
 - **Effects**: [Canvas Confetti](https://www.npmjs.com/package/canvas-confetti)
-- **Styling**: Vanilla CSS with Modern Glassmorphism
+- **Styling**: Vanilla CSS with Modern Glassmorphism & Responsive Grid
 - **Typography**: Google Fonts (Inter, Mitr, Sarabun)
+- **Deployment**: Configured for Single Page Application (SPA) deployment on **Vercel**.
 
 ## 🚀 Getting Started
 
@@ -49,12 +52,20 @@ A minimalist, premium, and heartfelt web application built to provide encouragem
 4. **Open in Browser**
    Navigate to `http://localhost:5173` to see the magic.
 
+## ☁️ Deployment (Vercel)
+
+This project contains a `vercel.json` file designed to run the React app as a seamless Single Page Application (SPA).
+1. Push the code to GitHub.
+2. Import the repository into [Vercel](https://vercel.com).
+3. Vercel will automatically detect Vite and build the project.
+
 ## 📂 Project Structure
 
-- `src/App.jsx`: Main logic, state management, and animations.
-- `src/index.css`: Core design system and glassmorphism styling.
+- `src/App.jsx`: Main logic, state management, image uploads, and animations.
+- `src/index.css`: Core design system, glassmorphism styling, and responsive masonry gallery.
 - `src/data/quotes.json`: The database of heart-warming quotes.
+- `vercel.json`: Vercel routing configuration for SPA compatibility.
 
 ---
 
-Built with ❤️ for someone special by [TIM1Zk](https://github.com/TIM1Zk).
+Built with ❤️ for someone special By TIM1Zk_
