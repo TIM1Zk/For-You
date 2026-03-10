@@ -18,6 +18,13 @@ function App() {
   const [imageName, setImageName] = useState("");
   const [showUpload, setShowUpload] = useState(false);
 
+  const [currentPage, setCurrentPage] = useState('home');
+
+  const mockImages = [
+    { id: 'mock1', url: 'https://picsum.photos/200/150?random=1', name: 'ความน่ารักจากเพื่อน', timestamp: '11 มี.ค. 2026 10:00' },
+    { id: 'mock2', url: 'https://picsum.photos/200/150?random=2', name: 'รูปน่ารักๆ', timestamp: '11 มี.ค. 2026 11:00' },
+    { id: 'mock3', url: 'https://picsum.photos/200/150?random=3', name: 'น่ารักมาก', timestamp: '11 มี.ค. 2026 12:00' },
+  ];
 
   // Helper to shuffle an array
   const shuffleArray = (array) => {
@@ -160,7 +167,7 @@ function App() {
       <div className="blob blob-3"></div>
 
       <AnimatePresence mode="wait">
-        {isVisible && !showUpload && (
+        {currentPage === 'home' && isVisible && !showUpload && (
           <motion.div
             key={quote.text}
             className="quote-card"
@@ -196,6 +203,14 @@ function App() {
             >
               <Camera size={18} /> อัพโหลดความน่ารัก
             </button>
+
+            <button
+              className="btn-gallery"
+              onClick={() => setCurrentPage('gallery')}
+            >
+ดู Gallery 🖼️
+            </button>
+
           </motion.div>
         )}
 
@@ -253,29 +268,44 @@ function App() {
         )}
       </AnimatePresence>
 
-      <div className="gallery-container">
-        <AnimatePresence>
-          {images.map((img) => (
-            <motion.div
-              key={img.id}
-              className="gallery-item"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              layout
-            >
-              <img src={img.url} alt={img.name} className="gallery-img" />
-              <div className="gallery-info">
-                <p className="img-name"><User size={12} /> {img.name}</p>
-                <p className="img-time"><Clock size={12} /> {img.timestamp}</p>
-                <button className="btn-delete" onClick={() => deleteImage(img.id)}>
-                  <Trash2 size={14} />
-                </button>
-              </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </div>
+      {currentPage === 'gallery' && (
+        <motion.div
+          className="gallery-page"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <div className="gallery-header">
+            <h2>Gallery ความน่ารัก ✨</h2>
+            <button className="btn-back" onClick={() => setCurrentPage('home')}>กลับ</button>
+          </div>
+          <div className="gallery-full-container">
+            <AnimatePresence>
+              {[...mockImages, ...images].map((img) => (
+                <motion.div
+                  key={img.id}
+                  className="gallery-item"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  layout
+                >
+                  <img src={img.url} alt={img.name} className="gallery-img" />
+                  <div className="gallery-info">
+                    <p className="img-name"><User size={12} /> {img.name}</p>
+                    <p className="img-time"><Clock size={12} /> {img.timestamp}</p>
+                    {!img.id.startsWith('mock') && (
+                      <button className="btn-delete" onClick={() => deleteImage(img.id)}>
+                        <Trash2 size={14} />
+                      </button>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+        </motion.div>
+      )}
 
 
       <footer style={{
