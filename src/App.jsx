@@ -20,12 +20,6 @@ function App() {
 
   const [currentPage, setCurrentPage] = useState('home');
 
-  const mockImages = [
-    { id: 'mock1', url: 'https://picsum.photos/200/150?random=1', name: 'ความน่ารักจากเพื่อน', timestamp: '11 มี.ค. 2026 10:00' },
-    { id: 'mock2', url: 'https://picsum.photos/200/150?random=2', name: 'รูปน่ารักๆ', timestamp: '11 มี.ค. 2026 11:00' },
-    { id: 'mock3', url: 'https://picsum.photos/200/150?random=3', name: 'น่ารักมาก', timestamp: '11 มี.ค. 2026 12:00' },
-  ];
-
   // Helper to shuffle an array
   const shuffleArray = (array) => {
     let result = [...array];
@@ -281,7 +275,7 @@ function App() {
           </div>
           <div className="gallery-full-container">
             <AnimatePresence>
-              {[...mockImages, ...images].map((img) => (
+              {images.map((img) => (
                 <motion.div
                   key={img.id}
                   className="gallery-item"
