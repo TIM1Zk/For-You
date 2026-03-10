@@ -2,18 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import quotesData from './data/quotes.json';
-import { Camera, Trash2, Send, Clock, User } from 'lucide-react';
-
+import { Camera, Trash2, Send, Clock, User, Loader2 } from 'lucide-react';
+import { supabase } from './supabaseClient';
 
 function App() {
   const [quote, setQuote] = useState({ text: "", author: "" });
   const [isVisible, setIsVisible] = useState(false);
   const [normalDeck, setNormalDeck] = useState([]);
   const [specialDeck, setSpecialDeck] = useState([]);
-  const [images, setImages] = useState(() => {
-    const saved = localStorage.getItem('cute_images');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [images, setImages] = useState([]);
+  const [isLoadingImages, setIsLoadingImages] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [newImage, setNewImage] = useState(null);
   const [imageName, setImageName] = useState("");
   const [showUpload, setShowUpload] = useState(false);
@@ -61,11 +60,25 @@ function App() {
     setSpecialDeck(shuffledSpecial);
 
     setIsVisible(true);
+    fetchImages();
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem('cute_images', JSON.stringify(images));
-  }, [images]);
+  const fetchImages = async () => {
+    setIsLoadingImages(true);
+    try {
+      const { data, error } = await supabase
+        .from('images')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setImages(data || []);
+    } catch (error) {
+      console.error("Error fetching images:", error.message);
+    } finally {
+      setIsLoadingImages(false);
+    }
+  };
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -78,31 +91,94 @@ function App() {
     }
   };
 
-  const saveImage = () => {
+  const saveImage = async () => {
     if (!newImage || !imageName.trim()) return;
+    setIsUploading(true);
 
-    const imgObj = {
-      id: Date.now(),
-      url: newImage,
-      name: imageName,
-      timestamp: new Date().toLocaleString('th-TH', {
+    try {
+      // Convert base64 to blob
+      const res = await fetch(newImage);
+      const blob = await res.blob();
+
+      const fileExt = blob.type.split('/')[1] || 'jpg';
+      const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+      // Upload to Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('gallery')
+        .upload(fileName, blob);
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('gallery')
+        .getPublicUrl(fileName);
+
+      const timestamp = new Date().toLocaleString('th-TH', {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit'
-      })
-    };
+      });
 
-    setImages([imgObj, ...images]);
-    setNewImage(null);
-    setImageName("");
-    setShowUpload(false);
-    triggerConfetti();
+      // Save to database
+      const newImgRecord = {
+        name: imageName,
+        url: publicUrl,
+        timestamp: timestamp
+      };
+
+      const { data: dbData, error: dbError } = await supabase
+        .from('images')
+        .insert([newImgRecord])
+        .select()
+        .single();
+
+      if (dbError) throw dbError;
+
+      setImages([dbData, ...images]);
+      setNewImage(null);
+      setImageName("");
+      setShowUpload(false);
+      triggerConfetti();
+
+    } catch (error) {
+      console.error("Error uploading image:", error.message);
+      alert("เกิดข้อผิดพลาดในการอัพโหลดรูปภาพ โปรดลองอีกครั้ง");
+    } finally {
+      setIsUploading(false);
+    }
   };
 
-  const deleteImage = (id) => {
-    setImages(images.filter(img => img.id !== id));
+  const deleteImage = async (id, url) => {
+    if (!window.confirm("คุณแน่ใจหรือไม่ที่จะลบรูปภาพนี้?")) return;
+
+    try {
+      // Extract filename from URL
+      const fileName = url.split('/').pop();
+
+      // Delete from storage
+      const { error: storageError } = await supabase.storage
+        .from('gallery')
+        .remove([fileName]);
+
+      if (storageError) throw storageError;
+
+      // Delete from database
+      const { error: dbError } = await supabase
+        .from('images')
+        .delete()
+        .match({ id });
+
+      if (dbError) throw dbError;
+
+      setImages(images.filter(img => img.id !== id));
+    } catch (error) {
+      console.error("Error deleting image:", error.message);
+      alert("เกิดข้อผิดพลาดในการลบรูปภาพ โปรดลองอีกครั้ง");
+    }
   };
 
 
@@ -253,9 +329,10 @@ function App() {
               <button
                 className="btn-save"
                 onClick={saveImage}
-                disabled={!newImage || !imageName.trim()}
+                disabled={!newImage || !imageName.trim() || isUploading}
               >
-                <Send size={18} /> บันทึกเลย!
+                {isUploading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+                {isUploading ? 'กำลังบันทึก...' : 'บันทึกเลย!'}
               </button>
             </div>
           </motion.div>
@@ -278,29 +355,40 @@ function App() {
             <button className="btn-back" onClick={() => setCurrentPage('home')}>กลับ</button>
           </div>
           <div className="gallery-full-container">
-            <AnimatePresence>
-              {images.map((img) => (
-                <motion.div
-                  key={img.id}
-                  className="gallery-item"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  layout
-                >
-                  <img src={img.url} alt={img.name} className="gallery-img" />
-                  <div className="gallery-info">
-                    <p className="img-name"><User size={12} /> {img.name}</p>
-                    <p className="img-time"><Clock size={12} /> {img.timestamp}</p>
-                    {!String(img.id).startsWith('mock') && (
-                      <button className="btn-delete" onClick={() => deleteImage(img.id)}>
-                        <Trash2 size={14} />
-                      </button>
-                    )}
+            {isLoadingImages ? (
+              <div style={{ width: '100%', textAlign: 'center', marginTop: '50px', color: '#888' }}>
+                <Loader2 className="animate-spin" size={30} style={{ margin: '0 auto', marginBottom: '10px' }} />
+                <p>กำลังโหลดความน่ารัก...</p>
+              </div>
+            ) : (
+              <AnimatePresence>
+                {images.length === 0 ? (
+                  <div style={{ width: '100%', textAlign: 'center', marginTop: '50px', color: '#aaa', gridColumn: '1 / -1' }}>
+                    <p>ยังไม่มีรูปภาพใน Gallery เลย ลองอัพโหลดเป็นคนแรกสิ! ✨</p>
                   </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
+                ) : (
+                  images.map((img) => (
+                    <motion.div
+                      key={img.id}
+                      className="gallery-item"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      layout
+                    >
+                      <img src={img.url} alt={img.name} className="gallery-img" />
+                      <div className="gallery-info">
+                        <p className="img-name"><User size={12} /> {img.name}</p>
+                        <p className="img-time"><Clock size={12} /> {img.timestamp}</p>
+                        <button className="btn-delete" onClick={() => deleteImage(img.id, img.url)}>
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </motion.div>
+                  ))
+                )}
+              </AnimatePresence>
+            )}
           </div>
         </motion.div>
       )}
