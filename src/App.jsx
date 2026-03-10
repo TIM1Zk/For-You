@@ -208,7 +208,7 @@ function App() {
               className="btn-gallery"
               onClick={() => setCurrentPage('gallery')}
             >
-ดู Gallery 🖼️
+              ดู Gallery 🖼️
             </button>
 
           </motion.div>
@@ -294,7 +294,7 @@ function App() {
                   <div className="gallery-info">
                     <p className="img-name"><User size={12} /> {img.name}</p>
                     <p className="img-time"><Clock size={12} /> {img.timestamp}</p>
-                    {!img.id.startsWith('mock') && (
+                    {!String(img.id).startsWith('mock') && (
                       <button className="btn-delete" onClick={() => deleteImage(img.id)}>
                         <Trash2 size={14} />
                       </button>
