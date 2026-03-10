@@ -10,7 +10,7 @@ A minimalist, premium, and heartfelt web application built to provide encouragem
   - A beautiful **Heart Confetti Explosion** ❤️
   - Deeply emotional and sweet personal messages.
   - An **Automatic Call Trigger** to bridge the distance instantly.
-- **📸 Cute Gallery & Upload**: Users can upload their own cute images which are saved locally. Features a responsive masonry grid layout to view all uploaded memories.
+- **📸 Global Image Gallery**: Users can upload their own cute images which are saved to **Supabase Storage**. The gallery syncs in real-time pulling from the **Supabase Database**, so you both see the updates instantly. Features a responsive masonry grid layout with transparent glassmorphism design.
 - **✨ Smooth Interactions**: Fluid transitions and micro-animations powered by Framer Motion.
 - **📱 Responsive Design**: Optimized for a premium experience on both Desktop and Mobile devices.
 
@@ -22,6 +22,7 @@ A minimalist, premium, and heartfelt web application built to provide encouragem
 - **Effects**: [Canvas Confetti](https://www.npmjs.com/package/canvas-confetti)
 - **Styling**: Vanilla CSS with Modern Glassmorphism & Responsive Grid
 - **Typography**: Google Fonts (Inter, Mitr, Sarabun)
+- **Backend & Storage**: [Supabase](https://supabase.com) (Database, Auth, and Storage)
 - **Deployment**: Configured for Single Page Application (SPA) deployment on **Vercel**.
 
 ## 🚀 Getting Started
@@ -30,6 +31,7 @@ A minimalist, premium, and heartfelt web application built to provide encouragem
 
 - Node.js (v18 or higher)
 - npm or yarn
+- A Supabase Project with a `gallery` public storage bucket and an `images` table.
 
 ### Installation
 
@@ -52,12 +54,20 @@ A minimalist, premium, and heartfelt web application built to provide encouragem
 4. **Open in Browser**
    Navigate to `http://localhost:5173` to see the magic.
 
+5. **Environment Variables**
+   Create a `.env.local` file in the root directory and add your Supabase credentials:
+   ```env
+   VITE_SUPABASE_URL=your-supabase-project-url
+   VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+   ```
+
 ## ☁️ Deployment (Vercel)
 
 This project contains a `vercel.json` file designed to run the React app as a seamless Single Page Application (SPA).
 1. Push the code to GitHub.
 2. Import the repository into [Vercel](https://vercel.com).
-3. Vercel will automatically detect Vite and build the project.
+3. **Important:** Before deploying, go to Settings > Environment Variables in Vercel and add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
+4. Vercel will automatically detect Vite and build the project.
 
 ## 📂 Project Structure
 
