@@ -531,3 +531,90 @@ body {
     padding: 40px;
   }
 }
+
+/* iPhone 16 Plus and Mobile Responsiveness */
+@media (max-width: 500px) {
+  .app-container {
+    padding: 10px;
+  }
+
+  .quote-card {
+    padding: 2rem 1.5rem;
+    max-width: 100%;
+    margin: 10px;
+  }
+
+  .quote-text {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .button-group {
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+  }
+
+  .btn-primary, .btn-special {
+    width: 100%;
+    margin-left: 0 !important;
+    padding: 14px;
+    font-size: 1rem;
+  }
+
+  .btn-upload-toggle {
+    width: 100%;
+    justify-content: center;
+    padding: 12px;
+  }
+
+  .gallery-page {
+    width: 100%;
+  }
+
+  .gallery-header {
+    padding: 15px 20px;
+  }
+
+  .gallery-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .gallery-full-container {
+    grid-template-columns: repeat(2, 1fr);
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .gallery-item {
+    min-width: unset;
+  }
+
+  .gallery-img {
+    height: 130px;
+  }
+
+  .gallery-info {
+    padding: 8px;
+  }
+
+  .img-name {
+    font-size: 0.75rem;
+  }
+
+  .img-time {
+    font-size: 0.6rem;
+  }
+
+  footer {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(5px);
+    padding: 5px 10px;
+    border-radius: 10px;
+    width: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    white-space: nowrap;
+  }
+}
