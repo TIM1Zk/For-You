@@ -25,17 +25,19 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .app-container {
   position: relative;
   width: 100%;
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  padding: 40px 20px;
 }
 
 /* Floating Background Elements */
@@ -86,8 +88,8 @@ body {
   border: 1px solid var(--glass-border);
   border-radius: 24px;
   padding: 3rem;
+  width: 95%;
   max-width: 500px;
-  width: 100%;
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
   text-align: center;
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -442,22 +444,10 @@ body {
 }
 
 /* Responsive Overrides */
-@media (max-height: 800px) {
-  body {
-    overflow-y: auto;
-    align-items: flex-start;
-    padding-top: 50px;
-  }
-
+@media (max-height: 700px) {
   .app-container {
-    height: auto;
-    min-height: 100vh;
-  }
-
-  .gallery-container {
-    position: relative;
-    bottom: 0;
-    margin-top: 40px;
+    padding-top: 20px;
+    padding-bottom: 20px;
   }
 }
 
@@ -533,15 +523,28 @@ body {
 }
 
 /* iPhone 16 Plus and Mobile Responsiveness */
+.app-footer {
+  margin-top: 40px;
+  padding: 20px 0;
+  font-size: 0.7rem;
+  color: #aaa;
+  letter-spacing: 1px;
+  text-align: center;
+  width: 100%;
+  z-index: 10;
+}
+
+/* iPhone 16 Plus and Mobile Responsiveness */
 @media (max-width: 500px) {
   .app-container {
-    padding: 10px;
+    padding: 30px 15px;
   }
 
   .quote-card {
-    padding: 2rem 1.5rem;
+    padding: 2.5rem 1.5rem;
     max-width: 100%;
-    margin: 10px;
+    margin: 15px 0;
+    width: 95%;
   }
 
   .quote-text {
@@ -581,9 +584,9 @@ body {
   }
 
   .gallery-full-container {
-    grid-template-columns: repeat(2, 1fr);
-    padding: 12px;
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    padding: 15px;
+    gap: 15px;
   }
 
   .gallery-item {
@@ -591,30 +594,18 @@ body {
   }
 
   .gallery-img {
-    height: 130px;
+    height: 140px;
   }
 
   .gallery-info {
-    padding: 8px;
+    padding: 10px;
   }
 
   .img-name {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
   }
 
   .img-time {
-    font-size: 0.6rem;
-  }
-
-  footer {
-    background: rgba(255, 255, 255, 0.4);
-    backdrop-filter: blur(5px);
-    padding: 5px 10px;
-    border-radius: 10px;
-    width: auto;
-    left: 50%;
-    transform: translateX(-50%);
-    text-align: center;
-    white-space: nowrap;
+    font-size: 0.65rem;
   }
 }

@@ -394,13 +394,7 @@ function App() {
       )}
 
 
-      <footer style={{
-        position: 'absolute',
-        bottom: '20px',
-        fontSize: '0.7rem',
-        color: '#aaa',
-        letterSpacing: '1px'
-      }}>
+      <footer className="app-footer">
         WITH LOVE • MADE BY TIM1Zk • 2026
       </footer>
     </div>
