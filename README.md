@@ -12,7 +12,10 @@ A minimalist, premium, and heartfelt web application built to provide encouragem
   - A beautiful **Heart Confetti Explosion** ❤️
   - Deeply emotional and sweet personal messages.
   - An **Automatic Call Trigger** to bridge the distance instantly.
-- **🖼️ Global Image Gallery**: Users can upload their own cute images to the shared gallery. Features a responsive masonry grid layout with transparent glassmorphism design.
+- **🖼️ Global Image Gallery**: Users can upload their own cute images to the shared gallery. Features a responsive masonry grid layout with:
+  - **🔍 Full-screen Preview**: Click any image to view it in an elegant, blurred modal.
+  - **💾 Direct Download**: A dedicated button to save high-resolution images to your device.
+- **✨ Smooth Interactions**: Fluid transitions and micro-animations powered by Framer Motion.
 
 ## 🛠️ Technology Stack
 
