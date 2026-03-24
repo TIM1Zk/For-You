@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import quotesData from './data/quotes.json';
-import { Camera, Trash2, Send, Clock, User, Loader2 } from 'lucide-react';
+import { Camera, Trash2, Send, Clock, User, Loader2, Download, X } from 'lucide-react';
 import { supabase } from './supabaseClient';
 
 function App() {
@@ -23,6 +23,9 @@ function App() {
   const [days, setDays] = useState(0);
   const [leftImg, setLeftImg] = useState(null);
   const [rightImg, setRightImg] = useState(null);
+
+  // NEW: Gallery Preview State
+  const [selectedImg, setSelectedImg] = useState(null);
 
   const startDate = new Date('2026-03-25');
 
@@ -258,6 +261,23 @@ function App() {
       confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }, colors: ['#ffb7c5', '#ff9a9e', '#fecfef'], shapes: ['heart'] });
     }, 250);
   };
+  const downloadImage = async (url, name) => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = `${name || 'image'}.jpg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error("Error downloading image:", error);
+      alert("ไม่สามารถดาวน์โหลดรูปภาพได้");
+    }
+  };
 
   return (
     <div className="app-container">
@@ -448,12 +468,17 @@ function App() {
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.8 }}
                       layout
+                      onClick={() => setSelectedImg(img)}
+                      style={{ cursor: 'zoom-in' }}
                     >
                       <img src={img.url} alt={img.name} className="gallery-img" />
                       <div className="gallery-info">
                         <p className="img-name"><User size={12} /> {img.name}</p>
                         <p className="img-time"><Clock size={12} /> {img.timestamp}</p>
-                        <button className="btn-delete" onClick={() => deleteImage(img.id, img.url)}>
+                        <button className="btn-delete" onClick={(e) => {
+                          e.stopPropagation();
+                          deleteImage(img.id, img.url);
+                        }}>
                           <Trash2 size={14} />
                         </button>
                       </div>
@@ -469,6 +494,43 @@ function App() {
       <footer className="app-footer">
         WITH LOVE • MADE BY TIM1Zk • 2026
       </footer>
+
+      {/* IMAGE PREVIEW MODAL */}
+      <AnimatePresence>
+        {selectedImg && (
+          <motion.div 
+            className="image-modal-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSelectedImg(null)}
+          >
+            <motion.div 
+              className="image-modal-content"
+              initial={{ scale: 0.8, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.8, opacity: 0, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <img src={selectedImg.url} alt={selectedImg.name} className="full-res-img" />
+              
+              <div className="modal-actions">
+                <button className="modal-btn download-btn" onClick={() => downloadImage(selectedImg.url, selectedImg.name)}>
+                  <Download size={20} /> ดาวน์โหลด
+                </button>
+                <button className="modal-btn close-btn" onClick={() => setSelectedImg(null)}>
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="modal-info">
+                <h3>{selectedImg.name}</h3>
+                <p><Clock size={14} /> {selectedImg.timestamp}</p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

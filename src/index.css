@@ -775,3 +775,117 @@ body {
     font-size: 1.8rem;
   }
 }
+
+/* Image Preview Modal */
+.image-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.image-modal-content {
+  position: relative;
+  max-width: 90%;
+  max-height: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.full-res-img {
+  max-width: 100%;
+  max-height: 70vh;
+  border-radius: 24px;
+  box-shadow: 0 25px 50px -12px rgba(255, 183, 197, 0.5);
+  border: 8px solid rgba(255, 255, 255, 0.8);
+  object-fit: contain;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 15px;
+  width: 100%;
+  justify-content: center;
+}
+
+.modal-btn {
+  padding: 12px 24px;
+  border-radius: 50px;
+  border: none;
+  font-family: 'Mitr', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.download-btn {
+  background: linear-gradient(135deg, var(--primary-accent), #ff9a9e);
+  color: white;
+}
+
+.download-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 154, 158, 0.4);
+}
+
+.close-btn {
+  background: rgba(255, 255, 255, 0.8);
+  color: #666;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  justify-content: center;
+}
+
+.close-btn:hover {
+  background: white;
+  color: var(--primary-accent);
+  transform: rotate(90deg);
+}
+
+.modal-info {
+  text-align: center;
+  color: #555;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 15px 30px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.modal-info h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.modal-info p {
+  margin: 5px 0 0;
+  font-size: 0.85rem;
+  color: #888;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+/* Update gallery item for pointer cursor */
+.gallery-item {
+  cursor: zoom-in;
+}
