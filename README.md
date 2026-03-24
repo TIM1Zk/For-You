@@ -5,14 +5,14 @@ A minimalist, premium, and heartfelt web application built to provide encouragem
 ## 🌟 Features
 
 - **🎨 "Less is More" Aesthetic**: Clean glassmorphism design with soft, dynamic background elements for a calm and focused atmosphere.
+- **💖 Love Counter Section**: A heart-warming anniversary counter that tracks the number of days since **March 25, 2026**, featuring a large, vibrant gradient display.
+- **📸 Interactive Couple Cards**: Two dedicated, shared photo slots ("Me" & "You") for the couple. Uploading a photo updates it for everyone instantly via **Supabase Database & Storage**.
 - **💌 Randomized Encouragement**: A curated collection of meaningful quotes in both **Thai** and **English**, specifically focused on study and perseverance.
-- **💖 Special Encouragement Mode**: A dedicated "Special" button that triggers:
+- **💝 Special Encouragement Mode**: A dedicated "Special" button that triggers:
   - A beautiful **Heart Confetti Explosion** ❤️
   - Deeply emotional and sweet personal messages.
   - An **Automatic Call Trigger** to bridge the distance instantly.
-- **📸 Global Image Gallery**: Users can upload their own cute images which are saved to **Supabase Storage**. The gallery syncs in real-time pulling from the **Supabase Database**, so you both see the updates instantly. Features a responsive masonry grid layout with transparent glassmorphism design.
-- **✨ Smooth Interactions**: Fluid transitions and micro-animations powered by Framer Motion.
-- **📱 Responsive Design**: Optimized for a premium experience on both Desktop and Mobile devices.
+- **🖼️ Global Image Gallery**: Users can upload their own cute images to the shared gallery. Features a responsive masonry grid layout with transparent glassmorphism design.
 
 ## 🛠️ Technology Stack
 
