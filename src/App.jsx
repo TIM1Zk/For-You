@@ -19,10 +19,10 @@ function App() {
   
   const [currentPage, setCurrentPage] = useState('home');
 
-  // NEW: Love Counter States
+  // LOVE COUNTER STATES
   const [days, setDays] = useState(0);
-  const [leftImg, setLeftImg] = useState(localStorage.getItem('leftImg') || null);
-  const [rightImg, setRightImg] = useState(localStorage.getItem('rightImg') || null);
+  const [leftImg, setLeftImg] = useState(null);
+  const [rightImg, setRightImg] = useState(null);
 
   const startDate = new Date('2026-03-25');
 
@@ -54,6 +54,26 @@ function App() {
     return nextQuote;
   };
 
+  const fetchLovePhotos = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('images')
+        .select('*')
+        .in('name', ['__LOVE_LEFT__', '__LOVE_RIGHT__'])
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      
+      const left = data.find(img => img.name === '__LOVE_LEFT__');
+      const right = data.find(img => img.name === '__LOVE_RIGHT__');
+      
+      if (left) setLeftImg(left.url);
+      if (right) setRightImg(right.url);
+    } catch (err) {
+      console.error("Error fetching love photos:", err.message);
+    }
+  };
+
   useEffect(() => {
     // Calculate Days
     const today = new Date();
@@ -73,6 +93,7 @@ function App() {
 
     setIsVisible(true);
     fetchImages();
+    fetchLovePhotos();
   }, []);
 
   const fetchImages = async () => {
@@ -81,6 +102,7 @@ function App() {
       const { data, error } = await supabase
         .from('images')
         .select('*')
+        .not('name', 'ilike', '__LOVE_%') // Don't show system images in gallery
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -99,24 +121,36 @@ function App() {
     setIsUploading(true);
     try {
       const fileExt = file.name.split('.').pop() || 'jpg';
-      const fileName = `love_${side}_${Date.now()}.${fileExt}`;
+      const storagePath = `system/love_${side}_${Date.now()}.${fileExt}`;
 
+      // 1. Upload to Storage
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('gallery')
-        .upload(fileName, file);
+        .upload(storagePath, file);
 
       if (uploadError) throw uploadError;
 
       const { data: { publicUrl } } = supabase.storage
         .from('gallery')
-        .getPublicUrl(fileName);
+        .getPublicUrl(storagePath);
+
+      // 2. Save to Database with special name
+      const systemName = side === 'left' ? '__LOVE_LEFT__' : '__LOVE_RIGHT__';
+      const timestamp = new Date().toLocaleString('th-TH', {
+        year: 'numeric', month: 'short', day: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
+
+      const { error: dbError } = await supabase
+        .from('images')
+        .insert([{ name: systemName, url: publicUrl, timestamp: timestamp }]);
+
+      if (dbError) throw dbError;
 
       if (side === 'left') {
         setLeftImg(publicUrl);
-        localStorage.setItem('leftImg', publicUrl);
       } else {
         setRightImg(publicUrl);
-        localStorage.setItem('rightImg', publicUrl);
       }
       
       triggerConfetti();
