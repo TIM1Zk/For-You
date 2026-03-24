@@ -610,3 +610,168 @@ body {
     font-size: 0.65rem;
   }
 }
+
+/* Love Counter Section */
+.love-counter-section {
+  text-align: center;
+  margin-bottom: 3rem;
+  width: 100%;
+  max-width: 600px;
+  animation: fadeIn 1s ease-out;
+}
+
+.counter-title {
+  font-family: 'Mitr', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 300;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  color: #888;
+  margin-bottom: 1rem;
+}
+
+.counter-display {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 2.5rem;
+}
+
+.days-number {
+  font-family: 'Mitr', sans-serif;
+  font-size: 6rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, var(--primary-accent), #ff9a9e);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1;
+  filter: drop-shadow(0 4px 10px rgba(255, 183, 197, 0.2));
+}
+
+.days-label {
+  font-family: 'Mitr', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 300;
+  color: #bbb;
+}
+
+.couple-cards {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 2rem;
+}
+
+.photo-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.photo-frame {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  padding: 6px;
+  background: white;
+  box-shadow: 0 10px 30px rgba(255, 183, 197, 0.3);
+  cursor: pointer;
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  overflow: hidden;
+  border: 4px solid rgba(255, 255, 255, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.photo-frame::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border-radius: 50%;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+  pointer-events: none;
+}
+
+.photo-frame:hover {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 15px 40px rgba(255, 183, 197, 0.5);
+}
+
+.couple-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.photo-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: #ddd;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.card-name {
+  font-family: 'Mitr', sans-serif;
+  font-weight: 400;
+  color: #777;
+  font-size: 1rem;
+  letter-spacing: 1px;
+}
+
+.heart-separator {
+  font-size: 2.5rem;
+  animation: heartPulse 1.8s infinite cubic-bezier(0.4, 0, 0.2, 1);
+  color: #ff9a9e;
+  filter: drop-shadow(0 0 8px rgba(255, 154, 158, 0.4));
+}
+
+@keyframes heartPulse {
+  0% { transform: scale(1); }
+  15% { transform: scale(1.35); }
+  30% { transform: scale(1); }
+  45% { transform: scale(1.2); }
+  60% { transform: scale(1); }
+}
+
+.home-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 600px;
+}
+
+/* Mobile Responsiveness Improvements */
+@media (max-width: 500px) {
+  .days-number {
+    font-size: 4.5rem;
+  }
+  
+  .days-label {
+    font-size: 1.4rem;
+  }
+  
+  .photo-frame {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .couple-cards {
+    gap: 20px;
+  }
+
+  .heart-separator {
+    font-size: 1.8rem;
+  }
+}

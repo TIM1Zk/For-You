@@ -16,8 +16,15 @@ function App() {
   const [newImage, setNewImage] = useState(null);
   const [imageName, setImageName] = useState("");
   const [showUpload, setShowUpload] = useState(false);
-
+  
   const [currentPage, setCurrentPage] = useState('home');
+
+  // NEW: Love Counter States
+  const [days, setDays] = useState(0);
+  const [leftImg, setLeftImg] = useState(localStorage.getItem('leftImg') || null);
+  const [rightImg, setRightImg] = useState(localStorage.getItem('rightImg') || null);
+
+  const startDate = new Date('2026-03-25');
 
   // Helper to shuffle an array
   const shuffleArray = (array) => {
@@ -32,10 +39,10 @@ function App() {
   // Initialize and get the first quote
   const getNextQuote = (isSpecial) => {
     const deck = isSpecial ? specialDeck : normalDeck;
-    const filtered = quotesData.filter(q => q.special === isSpecial);
+    const filtered = (quotesData || []).filter(q => q.special === isSpecial);
 
     const currentDeck = deck.length > 0 ? deck : shuffleArray(filtered);
-    const nextQuote = currentDeck[0];
+    const nextQuote = currentDeck[0] || { text: "สู้ๆ นะ!", author: "TIM1Zk" };
     const remaining = currentDeck.slice(1);
 
     if (isSpecial) {
@@ -48,16 +55,21 @@ function App() {
   };
 
   useEffect(() => {
-    // Initial load: Prepare normal deck and get first quote
-    const initialNormalQuotes = quotesData.filter(q => !q.special);
-    const initialSpecialQuotes = quotesData.filter(q => q.special);
+    // Calculate Days
+    const today = new Date();
+    const diffTime = today - startDate;
+    const diffDays = Math.max(1, Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1);
+    setDays(diffDays);
 
-    const shuffledNormal = shuffleArray(initialNormalQuotes);
-    const shuffledSpecial = shuffleArray(initialSpecialQuotes);
-
-    setQuote(shuffledNormal[0]);
-    setNormalDeck(shuffledNormal.slice(1));
-    setSpecialDeck(shuffledSpecial);
+    // Initial load for quotes
+    if (quotesData && quotesData.length > 0) {
+      const initialNormalQuotes = quotesData.filter(q => !q.special);
+      const initialSpecialQuotes = quotesData.filter(q => q.special);
+      const shuffledNormal = shuffleArray(initialNormalQuotes);
+      setQuote(shuffledNormal[0] || { text: "สู้ๆ นะ!", author: "TIM1Zk" });
+      setNormalDeck(shuffledNormal.slice(1));
+      setSpecialDeck(shuffleArray(initialSpecialQuotes));
+    }
 
     setIsVisible(true);
     fetchImages();
@@ -80,6 +92,42 @@ function App() {
     }
   };
 
+  const handleLoveImageUpload = async (e, side) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop() || 'jpg';
+      const fileName = `love_${side}_${Date.now()}.${fileExt}`;
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('gallery')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('gallery')
+        .getPublicUrl(fileName);
+
+      if (side === 'left') {
+        setLeftImg(publicUrl);
+        localStorage.setItem('leftImg', publicUrl);
+      } else {
+        setRightImg(publicUrl);
+        localStorage.setItem('rightImg', publicUrl);
+      }
+      
+      triggerConfetti();
+    } catch (error) {
+      console.error("Error uploading love image:", error.message);
+      alert("ไม่สามารถอัพโหลดรูปได้ โปรดลองอีกครั้ง");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -96,40 +144,27 @@ function App() {
     setIsUploading(true);
 
     try {
-      // Convert base64 to blob
       const res = await fetch(newImage);
       const blob = await res.blob();
-
       const fileExt = blob.type.split('/')[1] || 'jpg';
       const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
 
-      // Upload to Supabase Storage
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('gallery')
         .upload(fileName, blob);
 
       if (uploadError) throw uploadError;
 
-      // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from('gallery')
         .getPublicUrl(fileName);
 
       const timestamp = new Date().toLocaleString('th-TH', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+        year: 'numeric', month: 'short', day: 'numeric',
+        hour: '2-digit', minute: '2-digit'
       });
 
-      // Save to database
-      const newImgRecord = {
-        name: imageName,
-        url: publicUrl,
-        timestamp: timestamp
-      };
-
+      const newImgRecord = { name: imageName, url: publicUrl, timestamp: timestamp };
       const { data: dbData, error: dbError } = await supabase
         .from('images')
         .insert([newImgRecord])
@@ -143,10 +178,9 @@ function App() {
       setImageName("");
       setShowUpload(false);
       triggerConfetti();
-
     } catch (error) {
       console.error("Error uploading image:", error.message);
-      alert("เกิดข้อผิดพลาดในการอัพโหลดรูปภาพ โปรดลองอีกครั้ง");
+      alert("เกิดข้อผิดพลาดในการอัพโหลดรูปภาพ");
     } finally {
       setIsUploading(false);
     }
@@ -154,33 +188,15 @@ function App() {
 
   const deleteImage = async (id, url) => {
     if (!window.confirm("คุณแน่ใจหรือไม่ที่จะลบรูปภาพนี้?")) return;
-
     try {
-      // Extract filename from URL
       const fileName = url.split('/').pop();
-
-      // Delete from storage
-      const { error: storageError } = await supabase.storage
-        .from('gallery')
-        .remove([fileName]);
-
-      if (storageError) throw storageError;
-
-      // Delete from database
-      const { error: dbError } = await supabase
-        .from('images')
-        .delete()
-        .match({ id });
-
-      if (dbError) throw dbError;
-
+      await supabase.storage.from('gallery').remove([fileName]);
+      await supabase.from('images').delete().match({ id });
       setImages(images.filter(img => img.id !== id));
     } catch (error) {
       console.error("Error deleting image:", error.message);
-      alert("เกิดข้อผิดพลาดในการลบรูปภาพ โปรดลองอีกครั้ง");
     }
   };
-
 
   const handleRefresh = (isSpecial) => {
     if (isSpecial) {
@@ -188,11 +204,9 @@ function App() {
       window.location.href = 'tel:0628632916';
       return;
     }
-
     setIsVisible(false);
     setTimeout(() => {
-      const next = getNextQuote(false);
-      setQuote(next);
+      setQuote(getNextQuote(false));
       setIsVisible(true);
     }, 300);
   };
@@ -201,32 +215,13 @@ function App() {
     const duration = 3 * 1000;
     const animationEnd = Date.now() + duration;
     const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
-
     const randomInRange = (min, max) => Math.random() * (max - min) + min;
-
     const interval = setInterval(function () {
       const timeLeft = animationEnd - Date.now();
-
-      if (timeLeft <= 0) {
-        return clearInterval(interval);
-      }
-
+      if (timeLeft <= 0) return clearInterval(interval);
       const particleCount = 50 * (timeLeft / duration);
-
-      confetti({
-        ...defaults,
-        particleCount,
-        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
-        colors: ['#ffb7c5', '#ff9a9e', '#fecfef'],
-        shapes: ['heart'],
-      });
-      confetti({
-        ...defaults,
-        particleCount,
-        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
-        colors: ['#ffb7c5', '#ff9a9e', '#fecfef'],
-        shapes: ['heart'],
-      });
+      confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }, colors: ['#ffb7c5', '#ff9a9e', '#fecfef'], shapes: ['heart'] });
+      confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }, colors: ['#ffb7c5', '#ff9a9e', '#fecfef'], shapes: ['heart'] });
     }, 250);
   };
 
@@ -239,48 +234,94 @@ function App() {
       <AnimatePresence mode="wait">
         {currentPage === 'home' && isVisible && !showUpload && (
           <motion.div
-            key={quote.text}
-            className="quote-card"
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.95 }}
-            transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+            className="home-wrapper"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
           >
-            <p className="quote-text">“{quote.text}”</p>
-            <p className="quote-author">— {quote.author}</p>
-
-            <div className="button-group">
-              <button
-                className="btn-primary"
-                onClick={() => handleRefresh(false)}
-                aria-label="รับกำลังใจเพิ่ม"
+            {/* LOVE COUNTER SECTION */}
+            <div className="love-counter-section">
+              <motion.h1 
+                className="counter-title"
+                initial={{ y: -20 }}
+                animate={{ y: 0 }}
               >
-                ขอกำลังใจหน่อย ✨
-              </button>
+                เรารักกันมาแล้ว
+              </motion.h1>
+              
+              <div className="counter-display">
+                <motion.span 
+                  className="days-number"
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: "spring", stiffness: 100 }}
+                >
+                  {days}
+                </motion.span>
+                <span className="days-label">วัน</span>
+              </div>
 
-              <button
-                className="btn-special"
-                onClick={() => handleRefresh(true)}
-                aria-label="กำลังใจสุดพิเศษ"
-              >
-                กำลังใจพิเศษ ❤️
-              </button>
+              <div className="couple-cards">
+                <div className="photo-card left">
+                  <label className="photo-upload-label">
+                    <input type="file" accept="image/*" onChange={(e) => handleLoveImageUpload(e, 'left')} hidden />
+                    <div className="photo-frame">
+                      {leftImg ? (
+                        <img src={leftImg} alt="Left" className="couple-photo" />
+                      ) : (
+                        <div className="photo-placeholder">
+                          <User size={32} />
+                          <span>เพิ่มรูป (Me)</span>
+                        </div>
+                      )}
+                    </div>
+                  </label>
+                </div>
+
+                <div className="heart-separator">❤️</div>
+
+                <div className="photo-card right">
+                  <label className="photo-upload-label">
+                    <input type="file" accept="image/*" onChange={(e) => handleLoveImageUpload(e, 'right')} hidden />
+                    <div className="photo-frame">
+                      {rightImg ? (
+                        <img src={rightImg} alt="Right" className="couple-photo" />
+                      ) : (
+                        <div className="photo-placeholder">
+                          <User size={32} />
+                          <span>เพิ่มรูป (You)</span>
+                        </div>
+                      )}
+                    </div>
+                  </label>
+                </div>
+              </div>
             </div>
 
-            <button
-              className="btn-upload-toggle"
-              onClick={() => setShowUpload(true)}
+            {/* QUOTE SECTION */}
+            <motion.div
+              key={quote.text}
+              className="quote-card"
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ delay: 0.3 }}
             >
-              <Camera size={18} /> อัพโหลดความน่ารัก
-            </button>
+              <p className="quote-text">“{quote.text}”</p>
+              <p className="quote-author">— {quote.author}</p>
 
-            <button
-              className="btn-gallery"
-              onClick={() => setCurrentPage('gallery')}
-            >
-              ดู Gallery 🖼️
-            </button>
+              <div className="button-group">
+                <button className="btn-primary" onClick={() => handleRefresh(false)}>ขอกำลังใจหน่อย ✨</button>
+                <button className="btn-special" onClick={() => handleRefresh(true)}>กำลังใจพิเศษ ❤️</button>
+              </div>
 
+              <button className="btn-upload-toggle" onClick={() => setShowUpload(true)}>
+                <Camera size={18} /> อัพโหลดความน่ารัก
+              </button>
+
+              <button className="btn-gallery" onClick={() => setCurrentPage('gallery')}>
+                ดู Gallery 🖼️
+              </button>
+            </motion.div>
           </motion.div>
         )}
 
@@ -346,10 +387,8 @@ function App() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          {/* Decorative Blobs for Gallery Background */}
           <div className="blob" style={{ opacity: 0.5 }}></div>
           <div className="blob blob-2" style={{ opacity: 0.5 }}></div>
-
           <div className="gallery-header">
             <h2>Gallery ความน่ารัก ✨</h2>
             <button className="btn-back" onClick={() => setCurrentPage('home')}>กลับ</button>
@@ -392,7 +431,6 @@ function App() {
           </div>
         </motion.div>
       )}
-
 
       <footer className="app-footer">
         WITH LOVE • MADE BY TIM1Zk • 2026
