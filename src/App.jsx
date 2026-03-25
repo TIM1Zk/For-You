@@ -27,7 +27,7 @@ function App() {
   // NEW: Gallery Preview State
   const [selectedImg, setSelectedImg] = useState(null);
 
-  const startDate = new Date('2026-03-25');
+  const startDate = new Date(2026, 2, 25);
 
   // Helper to shuffle an array
   const shuffleArray = (array) => {
@@ -80,8 +80,12 @@ function App() {
   useEffect(() => {
     // Calculate Days
     const today = new Date();
-    const diffTime = today - startDate;
-    const diffDays = Math.max(1, Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1);
+    today.setHours(0, 0, 0, 0);
+    const start = new Date(startDate);
+    start.setHours(0, 0, 0, 0);
+
+    const diffTime = today - start;
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
     setDays(diffDays);
 
     // Initial load for quotes
