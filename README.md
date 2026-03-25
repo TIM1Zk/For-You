@@ -6,6 +6,8 @@ A minimalist, premium, and heartfelt web application built to provide encouragem
 
 - **🎨 "Less is More" Aesthetic**: Clean glassmorphism design with soft, dynamic background elements for a calm and focused atmosphere.
 - **💖 Love Counter Section**: A heart-warming anniversary counter that tracks the number of days since **March 25, 2026**, featuring a large, vibrant gradient display.
+- **📅 Dynamic Time Scaling**: The love counter automatically scales from days to months and years as time passes, providing a more premium feel for long-term tracking.
+- **🕒 Local Time Accuracy**: Advanced logic ensures the counter increments exactly at **Midnight (00:00)** according to your local timezone (Bangkok), eliminating UTC offset delays.
 - **📸 Interactive Couple Cards**: Two dedicated, shared photo slots ("Me" & "You") for the couple. Uploading a photo updates it for everyone instantly via **Supabase Database & Storage**.
 - **💌 Randomized Encouragement**: A curated collection of meaningful quotes in both **Thai** and **English**, specifically focused on study and perseverance.
 - **💝 Special Encouragement Mode**: A dedicated "Special" button that triggers:
