@@ -20,7 +20,7 @@ function App() {
   const [currentPage, setCurrentPage] = useState('home');
 
   // LOVE COUNTER STATES
-  const [days, setDays] = useState(0);
+  const [loveDuration, setLoveDuration] = useState({ years: 0, months: 0, days: 0 });
   const [leftImg, setLeftImg] = useState(null);
   const [rightImg, setRightImg] = useState(null);
 
@@ -78,15 +78,30 @@ function App() {
   };
 
   useEffect(() => {
-    // Calculate Days
+    // Calculate Detailed Duration
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const start = new Date(startDate);
     start.setHours(0, 0, 0, 0);
 
-    const diffTime = today - start;
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
-    setDays(diffDays);
+    const calculateDetailedDiff = (start, end) => {
+      let years = end.getFullYear() - start.getFullYear();
+      let months = end.getMonth() - start.getMonth();
+      let days = end.getDate() - start.getDate() + 1;
+
+      if (days <= 0) {
+        const prevMonthLastDay = new Date(end.getFullYear(), end.getMonth(), 0).getDate();
+        days += prevMonthLastDay;
+        months--;
+      }
+      if (months < 0) {
+        months += 12;
+        years--;
+      }
+      return { years, months, days };
+    };
+
+    setLoveDuration(calculateDetailedDiff(start, today));
 
     // Initial load for quotes
     if (quotesData && quotesData.length > 0) {
@@ -308,15 +323,36 @@ function App() {
               </motion.h1>
               
               <div className="counter-display">
-                <motion.span 
-                  className="days-number"
-                  initial={{ scale: 0.5, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ type: "spring", stiffness: 100 }}
-                >
-                  {days}
-                </motion.span>
-                <span className="days-label">วัน</span>
+                <AnimatePresence mode="popLayout">
+                  {loveDuration.years > 0 && (
+                    <motion.div 
+                      className="count-item"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                    >
+                      <span className="days-number">{loveDuration.years}</span>
+                      <span className="days-label">ปี</span>
+                    </motion.div>
+                  )}
+                  {loveDuration.months > 0 && (
+                    <motion.div 
+                      className="count-item"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                    >
+                      <span className="days-number">{loveDuration.months}</span>
+                      <span className="days-label">เดือน</span>
+                    </motion.div>
+                  )}
+                  <motion.div 
+                    className="count-item"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                  >
+                    <span className="days-number">{loveDuration.days}</span>
+                    <span className="days-label">วัน</span>
+                  </motion.div>
+                </AnimatePresence>
               </div>
 
               <div className="couple-cards">

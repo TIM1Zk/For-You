@@ -634,13 +634,20 @@ body {
   display: flex;
   align-items: baseline;
   justify-content: center;
-  gap: 12px;
+  gap: 1.5rem;
   margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.count-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
 }
 
 .days-number {
   font-family: 'Mitr', sans-serif;
-  font-size: 6rem;
+  font-size: 5rem;
   font-weight: 600;
   background: linear-gradient(135deg, var(--primary-accent), #ff9a9e);
   -webkit-background-clip: text;
@@ -755,11 +762,15 @@ body {
 /* Mobile Responsiveness Improvements */
 @media (max-width: 500px) {
   .days-number {
-    font-size: 4.5rem;
+    font-size: 3.5rem;
   }
   
   .days-label {
-    font-size: 1.4rem;
+    font-size: 1.2rem;
+  }
+
+  .counter-display {
+    gap: 1rem;
   }
   
   .photo-frame {
