@@ -87,9 +87,9 @@ function App() {
     const calculateDetailedDiff = (start, end) => {
       let years = end.getFullYear() - start.getFullYear();
       let months = end.getMonth() - start.getMonth();
-      let days = end.getDate() - start.getDate() + 1;
+      let days = end.getDate() - start.getDate();
 
-      if (days <= 0) {
+      if (days < 0) {
         const prevMonthLastDay = new Date(end.getFullYear(), end.getMonth(), 0).getDate();
         days += prevMonthLastDay;
         months--;
