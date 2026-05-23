@@ -25,6 +25,9 @@ function App() {
   const [leftImg, setLeftImg] = useState(null);
   const [rightImg, setRightImg] = useState(null);
 
+  // SURPRISE VIDEO STATE
+  const [showVideoModal, setShowVideoModal] = useState(false);
+
   // NEW: Gallery Preview State
   const [selectedImg, setSelectedImg] = useState(null);
 
@@ -558,6 +561,87 @@ function App() {
           </div>
         </motion.div>
       )}
+
+      {/* Floating Shaking Gift Box */}
+      {currentPage === 'home' && !showUpload && !showVideoModal && (
+        <motion.div 
+          className="gift-box-floating"
+          onClick={() => {
+            triggerConfetti();
+            setShowVideoModal(true);
+          }}
+          initial={{ scale: 0, rotate: -45 }}
+          animate={{ 
+            scale: 1, 
+            rotate: 0,
+            y: [0, -10, 0]
+          }}
+          transition={{
+            y: {
+              repeat: Infinity,
+              duration: 2,
+              ease: "easeInOut"
+            },
+            scale: { duration: 0.5 },
+            rotate: { duration: 0.5 }
+          }}
+          whileHover={{ scale: 1.15, rotate: 5 }}
+        >
+          <div className="gift-bow">🎁</div>
+          <span className="gift-badge">มีเซอร์ไพรส์! 💌</span>
+        </motion.div>
+      )}
+
+      {/* SURPRISE VIDEO MODAL */}
+      <AnimatePresence>
+        {showVideoModal && (
+          <motion.div 
+            className="video-modal-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div 
+              className="video-modal-content"
+              initial={{ scale: 0.8, opacity: 0, y: 30 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.8, opacity: 0, y: 30 }}
+              transition={{ type: "spring", damping: 25, stiffness: 120 }}
+            >
+              {/* Close Button */}
+              <button className="video-close-btn" onClick={() => setShowVideoModal(false)}>
+                <X size={22} />
+              </button>
+
+              <div className="video-header">
+                <h2>Our Precious Memories 💖</h2>
+                <p>ของขวัญพิเศษสำหรับเธอคนเดียวคนเดิม</p>
+              </div>
+
+              {/* YouTube Video Container */}
+              <div className="video-wrapper">
+                <iframe 
+                  src="https://www.youtube.com/embed/SEoDKUj-rVc?autoplay=1&rel=0&modestbranding=1" 
+                  title="Surprise Video"
+                  frameBorder="0" 
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                  allowFullScreen
+                ></iframe>
+              </div>
+
+              {/* Handwritten Sweet Card */}
+              <div className="sweet-card">
+                <p className="sweet-text">
+                  “ Happy 2-Month Anniversary นะคะที่รัก 🪐✨ <br />
+                  2 เดือนที่ผ่านมามันเป็นช่วงเวลาที่มีความสุขและมีความหมายที่สุดในชีวิตเค้าเลยนะ <br />
+                  ขอบคุณที่ก้าวเข้ามาเป็นโลกใบที่น่ารักที่สุด และคอยอยู่เคียงข้างคอยดูแลกันในทุกๆ วัน <br />
+                  รักเธอที่สุดในโลกและจะรักเพิ่มขึ้นในทุกๆ วันเลยนะคนดีของเค้า❤️ ”
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <footer className="app-footer">
         WITH LOVE • MADE BY TIM1Zk • 2026
