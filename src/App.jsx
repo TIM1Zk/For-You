@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import quotesData from './data/quotes.json';
@@ -13,7 +13,8 @@ function App() {
   const [images, setImages] = useState([]);
   const [isLoadingImages, setIsLoadingImages] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [newImage, setNewImage] = useState(null);
+  const [newImage, setNewImage] = useState(null); // Holds the object URL for upload preview
+  const [imageFile, setImageFile] = useState(null);   // Holds the raw File object for upload
   const [imageName, setImageName] = useState("");
   const [showUpload, setShowUpload] = useState(false);
   
@@ -29,18 +30,52 @@ function App() {
 
   const startDate = new Date(2026, 2, 25);
 
-  // Helper to shuffle an array
-  const shuffleArray = (array) => {
+  // Helper to shuffle an array (doesn't depend on state, but can be kept outside or as callback)
+  const shuffleArray = useCallback((array) => {
     let result = [...array];
     for (let i = result.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [result[i], result[j]] = [result[j], result[i]];
     }
     return result;
-  };
+  }, []);
+
+  // Confetti triggering helper
+  const triggerConfetti = useCallback(() => {
+    const duration = 3 * 1000;
+    const animationEnd = Date.now() + duration;
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+    const randomInRange = (min, max) => Math.random() * (max - min) + min;
+    const interval = setInterval(function () {
+      const timeLeft = animationEnd - Date.now();
+      if (timeLeft <= 0) return clearInterval(interval);
+      const particleCount = 50 * (timeLeft / duration);
+      confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }, colors: ['#ffb7c5', '#ff9a9e', '#fecfef'], shapes: ['heart'] });
+      confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }, colors: ['#ffb7c5', '#ff9a9e', '#fecfef'], shapes: ['heart'] });
+    }, 250);
+  }, []);
+
+  // Image downloading helper
+  const downloadImage = useCallback(async (url, name) => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = `${name || 'image'}.jpg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error("Error downloading image:", error);
+      alert("ไม่สามารถดาวน์โหลดรูปภาพได้");
+    }
+  }, []);
 
   // Initialize and get the first quote
-  const getNextQuote = (isSpecial) => {
+  const getNextQuote = useCallback((isSpecial) => {
     const deck = isSpecial ? specialDeck : normalDeck;
     const filtered = (quotesData || []).filter(q => q.special === isSpecial);
 
@@ -55,9 +90,9 @@ function App() {
     }
 
     return nextQuote;
-  };
+  }, [specialDeck, normalDeck, shuffleArray]);
 
-  const fetchLovePhotos = async () => {
+  const fetchLovePhotos = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('images')
@@ -75,7 +110,25 @@ function App() {
     } catch (err) {
       console.error("Error fetching love photos:", err.message);
     }
-  };
+  }, []);
+
+  const fetchImages = useCallback(async () => {
+    setIsLoadingImages(true);
+    try {
+      const { data, error } = await supabase
+        .from('images')
+        .select('*')
+        .not('name', 'ilike', '__LOVE_%') // Don't show system images in gallery
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setImages(data || []);
+    } catch (error) {
+      console.error("Error fetching images:", error.message);
+    } finally {
+      setIsLoadingImages(false);
+    }
+  }, []);
 
   useEffect(() => {
     // Calculate Detailed Duration
@@ -118,27 +171,18 @@ function App() {
     fetchLovePhotos();
   }, []);
 
-  const fetchImages = async () => {
-    setIsLoadingImages(true);
-    try {
-      const { data, error } = await supabase
-        .from('images')
-        .select('*')
-        .not('name', 'ilike', '__LOVE_%') // Don't show system images in gallery
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setImages(data || []);
-    } catch (error) {
-      console.error("Error fetching images:", error.message);
-    } finally {
-      setIsLoadingImages(false);
-    }
-  };
-
-  const handleLoveImageUpload = async (e, side) => {
+  const handleLoveImageUpload = useCallback(async (e, side) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert("กรุณาเลือกเฉพาะไฟล์รูปภาพเท่านั้น");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      alert("ขนาดไฟล์รูปภาพใหญ่เกินไป (สูงสุด 5MB)");
+      return;
+    }
 
     setIsUploading(true);
     try {
@@ -182,32 +226,40 @@ function App() {
     } finally {
       setIsUploading(false);
     }
-  };
+  }, [triggerConfetti]);
 
-  const handleImageUpload = (e) => {
+  const handleImageUpload = useCallback((e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setNewImage(reader.result);
-      };
-      reader.readAsDataURL(file);
+      if (!file.type.startsWith('image/')) {
+        alert("กรุณาเลือกเฉพาะไฟล์รูปภาพเท่านั้น");
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        alert("ขนาดไฟล์รูปภาพใหญ่เกินไป (สูงสุด 5MB)");
+        return;
+      }
+      // Revoke the old preview URL if exists to avoid memory leak
+      if (newImage) {
+        URL.revokeObjectURL(newImage);
+      }
+      setImageFile(file);
+      setNewImage(URL.createObjectURL(file));
     }
-  };
+  }, [newImage]);
 
-  const saveImage = async () => {
-    if (!newImage || !imageName.trim()) return;
+  const saveImage = useCallback(async () => {
+    if (!imageFile || !imageName.trim()) return;
     setIsUploading(true);
 
     try {
-      const res = await fetch(newImage);
-      const blob = await res.blob();
-      const fileExt = blob.type.split('/')[1] || 'jpg';
+      const fileExt = imageFile.name.split('.').pop() || 'jpg';
       const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
 
+      // Upload raw File object directly instead of fetching base64
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('gallery')
-        .upload(fileName, blob);
+        .upload(fileName, imageFile);
 
       if (uploadError) throw uploadError;
 
@@ -229,7 +281,13 @@ function App() {
 
       if (dbError) throw dbError;
 
-      setImages([dbData, ...images]);
+      setImages(prev => [dbData, ...prev]);
+      
+      // Cleanup preview URL
+      if (newImage) {
+        URL.revokeObjectURL(newImage);
+      }
+      setImageFile(null);
       setNewImage(null);
       setImageName("");
       setShowUpload(false);
@@ -240,21 +298,21 @@ function App() {
     } finally {
       setIsUploading(false);
     }
-  };
+  }, [imageFile, imageName, newImage, triggerConfetti]);
 
-  const deleteImage = async (id, url) => {
+  const deleteImage = useCallback(async (id, url) => {
     if (!window.confirm("คุณแน่ใจหรือไม่ที่จะลบรูปภาพนี้?")) return;
     try {
       const fileName = url.split('/').pop();
       await supabase.storage.from('gallery').remove([fileName]);
       await supabase.from('images').delete().match({ id });
-      setImages(images.filter(img => img.id !== id));
+      setImages(prev => prev.filter(img => img.id !== id));
     } catch (error) {
       console.error("Error deleting image:", error.message);
     }
-  };
+  }, []);
 
-  const handleRefresh = (isSpecial) => {
+  const handleRefresh = useCallback((isSpecial) => {
     if (isSpecial) {
       triggerConfetti();
       window.location.href = 'tel:0628632916';
@@ -265,38 +323,8 @@ function App() {
       setQuote(getNextQuote(false));
       setIsVisible(true);
     }, 300);
-  };
+  }, [getNextQuote, triggerConfetti]);
 
-  const triggerConfetti = () => {
-    const duration = 3 * 1000;
-    const animationEnd = Date.now() + duration;
-    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
-    const randomInRange = (min, max) => Math.random() * (max - min) + min;
-    const interval = setInterval(function () {
-      const timeLeft = animationEnd - Date.now();
-      if (timeLeft <= 0) return clearInterval(interval);
-      const particleCount = 50 * (timeLeft / duration);
-      confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }, colors: ['#ffb7c5', '#ff9a9e', '#fecfef'], shapes: ['heart'] });
-      confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }, colors: ['#ffb7c5', '#ff9a9e', '#fecfef'], shapes: ['heart'] });
-    }, 250);
-  };
-  const downloadImage = async (url, name) => {
-    try {
-      const response = await fetch(url);
-      const blob = await response.blob();
-      const blobUrl = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = `${name || 'image'}.jpg`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(blobUrl);
-    } catch (error) {
-      console.error("Error downloading image:", error);
-      alert("ไม่สามารถดาวน์โหลดรูปภาพได้");
-    }
-  };
 
   return (
     <div className="app-container">
@@ -511,7 +539,7 @@ function App() {
                       onClick={() => setSelectedImg(img)}
                       style={{ cursor: 'zoom-in' }}
                     >
-                      <img src={img.url} alt={img.name} className="gallery-img" />
+                      <img src={img.url} alt={img.name} className="gallery-img" loading="lazy" />
                       <div className="gallery-info">
                         <p className="img-name"><User size={12} /> {img.name}</p>
                         <p className="img-time"><Clock size={12} /> {img.timestamp}</p>
