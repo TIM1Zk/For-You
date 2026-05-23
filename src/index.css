@@ -219,10 +219,6 @@ body {
 
 .gallery-item {
   cursor: zoom-in;
-  display: inline-block;
-  width: 100%;
-  margin-bottom: 20px;
-  break-inside: avoid;
   background: rgba(255, 255, 255, 0.45);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -244,8 +240,7 @@ body {
 
 .gallery-img {
   width: 100%;
-  height: auto;
-  max-height: 380px;
+  height: 160px;
   object-fit: cover;
   display: block;
   transition: all 0.5s ease;
@@ -559,8 +554,11 @@ body {
   flex: 1;
   padding: 20px;
   overflow-y: auto;
-  column-count: 2;
-  column-gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
+  align-items: start;
+  align-content: start; /* Crucial! Packs grid rows tightly at the top and removes massive empty vertical gaps */
   width: 100%;
 }
 
@@ -569,19 +567,10 @@ body {
   min-width: unset;
 }
 
-/* Responsive Columns Adjustments */
+/* Responsive Grid Adjustments */
 @media (min-width: 768px) {
   .gallery-full-container {
-    column-count: 3;
-    column-gap: 20px;
-    padding: 30px;
-  }
-}
-
-@media (min-width: 1024px) {
-  .gallery-full-container {
-    column-count: 4;
-    column-gap: 24px;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     padding: 40px;
   }
 }
@@ -648,21 +637,21 @@ body {
   }
 
   .gallery-full-container {
-    column-count: 2;
-    column-gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     padding: 12px;
+    gap: 12px;
+    align-content: start; /* Packs mobile rows tightly too */
     padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 30px);
   }
 
   .gallery-item {
     min-width: unset;
-    margin-bottom: 12px;
     border-radius: 16px;
   }
 
   .gallery-img {
-    height: auto;
-    max-height: 240px;
+    height: 135px; /* Uniform height for mobile grid! */
+    object-fit: cover;
   }
 
   .gallery-info {
