@@ -5,6 +5,39 @@ import quotesData from './data/quotes.json';
 import { Camera, Trash2, Send, Clock, User, Loader2, Download, X } from 'lucide-react';
 import { supabase } from './supabaseClient';
 
+const surpriseVideos = [
+  {
+    id: 1,
+    tabLabel: "ความทรงจำที่ 1 💖",
+    title: "Our Precious Memories 💖",
+    subtitle: "ของขวัญพิเศษสำหรับคุณคนเดียวคนเดิม",
+    embedUrl: "https://www.youtube.com/embed/SEoDKUj-rVc?autoplay=1&rel=0&modestbranding=1",
+    sweetText: (
+      <>
+        Happy 2-Month Anniversary นะคะที่รัก 🪐✨ <br />
+        2 เดือนที่ผ่านมามันเป็นช่วงเวลาที่มีความสุขและมีความหมายที่สุดในชีวิตเค้าเลยนะ <br />
+        ขอบคุณที่ก้าวเข้ามาเป็นโลกใบที่น่ารักที่สุด และคอยอยู่เคียงข้างคอยดูแลกันในทุกๆ วัน <br />
+        รักคุณที่สุดในโลกและจะรักเพิ่มขึ้นในทุกๆ วันเลยนะคนดีของเค้า❤️
+      </>
+    )
+  },
+  {
+    id: 2,
+    tabLabel: "ความทรงจำที่ 2 🌟",
+    title: "Our Sweet Moments 🌟",
+    subtitle: "อีกหนึ่งความทรงจำดีๆ ที่อยากมอบให้คุณ",
+    embedUrl: "https://www.youtube.com/embed/Tq_OcOSZekk?autoplay=1&rel=0&modestbranding=1",
+    sweetText: (
+      <>
+        สุขสันต์วันพิเศษอีกหนึ่งวันนะคะที่รัก 🌟 <br />
+        คลิปนี้เค้าตั้งใจทำขึ้นมาให้คุณอีกคลิปเป็นเซอร์ไพรส์พิเศษเลยนะ <br />
+        หวังว่าคุณจะชอบและยิ้มแก้มปริเหมือนเคยนะคะ <br />
+        รักคุณเพิ่มขึ้นทุกๆ วันเลยนะคนเก่งของเค้า ❤️
+      </>
+    )
+  }
+];
+
 function App() {
   const [quote, setQuote] = useState({ text: "", author: "" });
   const [isVisible, setIsVisible] = useState(false);
@@ -17,7 +50,7 @@ function App() {
   const [imageFile, setImageFile] = useState(null);   // Holds the raw File object for upload
   const [imageName, setImageName] = useState("");
   const [showUpload, setShowUpload] = useState(false);
-  
+
   const [currentPage, setCurrentPage] = useState('home');
 
   // LOVE COUNTER STATES
@@ -27,6 +60,8 @@ function App() {
 
   // SURPRISE VIDEO STATE
   const [showVideoModal, setShowVideoModal] = useState(false);
+  const [activeVideoId, setActiveVideoId] = useState(1);
+  const activeVideo = surpriseVideos.find(v => v.id === activeVideoId) || surpriseVideos[0];
 
   // NEW: Gallery Preview State
   const [selectedImg, setSelectedImg] = useState(null);
@@ -104,10 +139,10 @@ function App() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      
+
       const left = data.find(img => img.name === '__LOVE_LEFT__');
       const right = data.find(img => img.name === '__LOVE_RIGHT__');
-      
+
       if (left) setLeftImg(left.url);
       if (right) setRightImg(right.url);
     } catch (err) {
@@ -221,7 +256,7 @@ function App() {
       } else {
         setRightImg(publicUrl);
       }
-      
+
       triggerConfetti();
     } catch (error) {
       console.error("Error uploading love image:", error.message);
@@ -285,7 +320,7 @@ function App() {
       if (dbError) throw dbError;
 
       setImages(prev => [dbData, ...prev]);
-      
+
       // Cleanup preview URL
       if (newImage) {
         URL.revokeObjectURL(newImage);
@@ -345,18 +380,18 @@ function App() {
           >
             {/* LOVE COUNTER SECTION */}
             <div className="love-counter-section">
-              <motion.h1 
+              <motion.h1
                 className="counter-title"
                 initial={{ y: -20 }}
                 animate={{ y: 0 }}
               >
                 เรารักกันมาแล้ว
               </motion.h1>
-              
+
               <div className="counter-display">
                 <AnimatePresence mode="popLayout">
                   {loveDuration.years > 0 && (
-                    <motion.div 
+                    <motion.div
                       className="count-item"
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -366,7 +401,7 @@ function App() {
                     </motion.div>
                   )}
                   {loveDuration.months > 0 && (
-                    <motion.div 
+                    <motion.div
                       className="count-item"
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -375,7 +410,7 @@ function App() {
                       <span className="days-label">เดือน</span>
                     </motion.div>
                   )}
-                  <motion.div 
+                  <motion.div
                     className="count-item"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -564,15 +599,15 @@ function App() {
 
       {/* Floating Shaking Gift Box */}
       {currentPage === 'home' && !showUpload && !showVideoModal && (
-        <motion.div 
+        <motion.div
           className="gift-box-floating"
           onClick={() => {
             triggerConfetti();
             setShowVideoModal(true);
           }}
           initial={{ scale: 0, rotate: -45 }}
-          animate={{ 
-            scale: 1, 
+          animate={{
+            scale: 1,
             rotate: 0,
             y: [0, -10, 0]
           }}
@@ -613,29 +648,44 @@ function App() {
                 <X size={22} />
               </button>
 
+              {/* Video Tabs Selector */}
+              <div className="video-tabs-container">
+                {surpriseVideos.map((vid) => (
+                  <button
+                    key={vid.id}
+                    className={`video-tab-btn ${activeVideoId === vid.id ? 'active' : ''}`}
+                    onClick={() => {
+                      triggerConfetti();
+                      setActiveVideoId(vid.id);
+                    }}
+                  >
+                    {vid.tabLabel}
+                  </button>
+                ))}
+              </div>
+
               <div className="video-header">
-                <h2>Our Precious Memories 💖</h2>
-                <p>ของขวัญพิเศษสำหรับเธอคนเดียวคนเดิม</p>
+                <h2>{activeVideo.title}</h2>
+                <p>{activeVideo.subtitle}</p>
               </div>
 
               {/* YouTube Video Container */}
               <div className="video-wrapper">
                 <iframe 
-                  src="https://www.youtube.com/embed/SEoDKUj-rVc?autoplay=1&rel=0&modestbranding=1" 
-                  title="Surprise Video"
+                  key={activeVideo.id}
+                  src={activeVideo.embedUrl} 
+                  title={activeVideo.title}
                   frameBorder="0" 
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                   allowFullScreen
+                  loading="lazy"
                 ></iframe>
               </div>
 
               {/* Handwritten Sweet Card */}
               <div className="sweet-card">
                 <p className="sweet-text">
-                  “ Happy 2-Month Anniversary นะคะที่รัก 🪐✨ <br />
-                  2 เดือนที่ผ่านมามันเป็นช่วงเวลาที่มีความสุขและมีความหมายที่สุดในชีวิตเค้าเลยนะ <br />
-                  ขอบคุณที่ก้าวเข้ามาเป็นโลกใบที่น่ารักที่สุด และคอยอยู่เคียงข้างคอยดูแลกันในทุกๆ วัน <br />
-                  รักเธอที่สุดในโลกและจะรักเพิ่มขึ้นในทุกๆ วันเลยนะคนดีของเค้า❤️ ”
+                  “ {activeVideo.sweetText} ”
                 </p>
               </div>
             </motion.div>
@@ -650,14 +700,14 @@ function App() {
       {/* IMAGE PREVIEW MODAL */}
       <AnimatePresence>
         {selectedImg && (
-          <motion.div 
+          <motion.div
             className="image-modal-overlay"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setSelectedImg(null)}
           >
-            <motion.div 
+            <motion.div
               className="image-modal-content"
               initial={{ scale: 0.8, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -665,7 +715,7 @@ function App() {
               onClick={(e) => e.stopPropagation()}
             >
               <img src={selectedImg.url} alt={selectedImg.name} className="full-res-img" />
-              
+
               <div className="modal-actions">
                 <button className="modal-btn download-btn" onClick={() => downloadImage(selectedImg.url, selectedImg.name)}>
                   <Download size={20} /> ดาวน์โหลด

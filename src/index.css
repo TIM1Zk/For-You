@@ -225,16 +225,16 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.6);
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.03), 
-              0 8px 16px -6px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.03),
+    0 8px 16px -6px rgba(0, 0, 0, 0.02);
   position: relative;
   transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .gallery-item:hover {
   transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 20px 35px -5px rgba(255, 183, 197, 0.25), 
-              0 12px 24px -8px rgba(255, 183, 197, 0.2);
+  box-shadow: 0 20px 35px -5px rgba(255, 183, 197, 0.25),
+    0 12px 24px -8px rgba(255, 183, 197, 0.2);
   border-color: rgba(255, 183, 197, 0.5);
 }
 
@@ -558,7 +558,8 @@ body {
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 20px;
   align-items: start;
-  align-content: start; /* Crucial! Packs grid rows tightly at the top and removes massive empty vertical gaps */
+  align-content: start;
+  /* Crucial! Packs grid rows tightly at the top and removes massive empty vertical gaps */
   width: 100%;
 }
 
@@ -611,7 +612,8 @@ body {
     gap: 12px;
   }
 
-  .btn-primary, .btn-special {
+  .btn-primary,
+  .btn-special {
     width: 100%;
     margin-left: 0 !important;
     padding: 14px;
@@ -640,7 +642,8 @@ body {
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     padding: 12px;
     gap: 12px;
-    align-content: start; /* Packs mobile rows tightly too */
+    align-content: start;
+    /* Packs mobile rows tightly too */
     padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 30px);
   }
 
@@ -650,7 +653,8 @@ body {
   }
 
   .gallery-img {
-    height: 135px; /* Uniform height for mobile grid! */
+    height: 135px;
+    /* Uniform height for mobile grid! */
     object-fit: cover;
   }
 
@@ -756,9 +760,12 @@ body {
 .photo-frame::after {
   content: '';
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   border-radius: 50%;
-  box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
   pointer-events: none;
 }
 
@@ -801,11 +808,25 @@ body {
 }
 
 @keyframes heartPulse {
-  0% { transform: scale(1); }
-  15% { transform: scale(1.35); }
-  30% { transform: scale(1); }
-  45% { transform: scale(1.2); }
-  60% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  15% {
+    transform: scale(1.35);
+  }
+
+  30% {
+    transform: scale(1);
+  }
+
+  45% {
+    transform: scale(1.2);
+  }
+
+  60% {
+    transform: scale(1);
+  }
 }
 
 .home-wrapper {
@@ -821,7 +842,7 @@ body {
   .days-number {
     font-size: 3.5rem;
   }
-  
+
   .days-label {
     font-size: 1.2rem;
   }
@@ -829,12 +850,12 @@ body {
   .counter-display {
     gap: 1rem;
   }
-  
+
   .photo-frame {
     width: 100px;
     height: 100px;
   }
-  
+
   .couple-cards {
     gap: 20px;
   }
@@ -967,8 +988,8 @@ body {
   height: 90px;
   background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
   border-radius: 50%;
-  box-shadow: 0 15px 35px rgba(255, 154, 158, 0.4), 
-              0 0 0 6px rgba(255, 255, 255, 0.8);
+  box-shadow: 0 15px 35px rgba(255, 154, 158, 0.4),
+    0 0 0 6px rgba(255, 255, 255, 0.8);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -981,7 +1002,7 @@ body {
 .gift-bow {
   font-size: 3rem;
   line-height: 1;
-  filter: drop-shadow(0 2px 5px rgba(0,0,0,0.1));
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.1));
 }
 
 .gift-badge {
@@ -1000,9 +1021,17 @@ body {
 }
 
 @keyframes badgePulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* Video Modal Overlay */
@@ -1012,7 +1041,8 @@ body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(15, 15, 20, 0.85); /* Deep dark theater mode background */
+  background: rgba(15, 15, 20, 0.85);
+  /* Deep dark theater mode background */
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   z-index: 9999;
@@ -1033,8 +1063,8 @@ body {
   width: 100%;
   max-width: 760px;
   padding: 30px;
-  box-shadow: 0 35px 80px -15px rgba(0, 0, 0, 0.5), 
-              0 0 50px rgba(255, 183, 197, 0.2);
+  box-shadow: 0 35px 80px -15px rgba(0, 0, 0, 0.5),
+    0 0 50px rgba(255, 183, 197, 0.2);
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -1042,8 +1072,13 @@ body {
 }
 
 @keyframes videoGlow {
-  from { box-shadow: 0 35px 80px -15px rgba(0, 0, 0, 0.5), 0 0 40px rgba(255, 183, 197, 0.15); }
-  to { box-shadow: 0 35px 80px -15px rgba(0, 0, 0, 0.5), 0 0 60px rgba(255, 183, 197, 0.35); }
+  from {
+    box-shadow: 0 35px 80px -15px rgba(0, 0, 0, 0.5), 0 0 40px rgba(255, 183, 197, 0.15);
+  }
+
+  to {
+    box-shadow: 0 35px 80px -15px rgba(0, 0, 0, 0.5), 0 0 60px rgba(255, 183, 197, 0.35);
+  }
 }
 
 .video-close-btn {
@@ -1096,7 +1131,8 @@ body {
 .video-wrapper {
   position: relative;
   width: 100%;
-  padding-top: 56.25%; /* 16:9 Aspect Ratio */
+  padding-top: 56.25%;
+  /* 16:9 Aspect Ratio */
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
@@ -1137,14 +1173,14 @@ body {
     right: 25px;
     width: 75px;
     height: 75px;
-    box-shadow: 0 10px 25px rgba(255, 154, 158, 0.4), 
-                0 0 0 4px rgba(255, 255, 255, 0.8);
+    box-shadow: 0 10px 25px rgba(255, 154, 158, 0.4),
+      0 0 0 4px rgba(255, 255, 255, 0.8);
   }
-  
+
   .gift-bow {
     font-size: 2.4rem;
   }
-  
+
   .video-modal-content {
     padding: 16px;
     border-radius: 24px;
@@ -1162,16 +1198,71 @@ body {
     height: 36px;
     background: rgba(255, 255, 255, 0.9);
     color: #333;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   }
-  
+
   .video-close-btn:hover {
     background: white;
     color: #ff4d4f;
   }
-  
+
   .sweet-text {
     font-size: 0.85rem;
     line-height: 1.6;
+  }
+}
+
+/* Video Tabs Selector */
+.video-tabs-container {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 5px;
+  background: rgba(255, 255, 255, 0.5);
+  padding: 6px;
+  border-radius: 50px;
+  border: 1px solid rgba(255, 183, 197, 0.3);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+  align-self: center;
+  max-width: 100%;
+}
+
+.video-tab-btn {
+  padding: 10px 24px;
+  border-radius: 50px;
+  border: none;
+  font-family: 'Mitr', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #888;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.video-tab-btn:hover {
+  color: #ff758c;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.video-tab-btn.active {
+  background: linear-gradient(135deg, #ff758c, #ff9a9e);
+  color: white;
+  box-shadow: 0 4px 15px rgba(255, 154, 158, 0.4);
+}
+
+/* Mobile adjustments for video tabs */
+@media (max-width: 500px) {
+  .video-tabs-container {
+    gap: 8px;
+    padding: 4px;
+    width: 100%;
+  }
+
+  .video-tab-btn {
+    flex: 1;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    text-align: center;
   }
 }
