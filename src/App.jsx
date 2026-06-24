@@ -38,6 +38,167 @@ const surpriseVideos = [
   }
 ];
 
+import { useRef } from 'react';
+
+const HeartCanvas = () => {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let animationFrameId;
+
+    const handleResize = () => {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight || 500;
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
+    const particles = [];
+    const numParticles = 75;
+    const heartPoints = [];
+
+    // Precalculate heart coordinates using the parametric formula
+    for (let i = 0; i < numParticles; i++) {
+      const t = (i / numParticles) * Math.PI * 2;
+      // Parametric equations for a heart curve
+      const x = 16 * Math.pow(Math.sin(t), 3);
+      // y-coordinate is inverted for canvas space (y increases downwards)
+      const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+      heartPoints.push({ x, y });
+    }
+
+    // Initialize particles
+    for (let i = 0; i < numParticles; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        targetX: 0,
+        targetY: 0,
+        fontSize: Math.random() * 3 + 11, // font size between 11px and 14px
+        // different speeds so they don't arrive at the same time
+        speed: Math.random() * 0.04 + 0.015,
+        color: `hsla(${340 + Math.random() * 25}, 100%, ${65 + Math.random() * 15}%, ${Math.random() * 0.6 + 0.4})`,
+        angle: Math.random() * Math.PI * 2,
+        pulseSpeed: Math.random() * 0.03 + 0.01,
+      });
+    }
+
+    // Background floating hearts
+    const floatingHearts = [];
+    const maxFloating = 20;
+
+    const createFloatingHeart = () => {
+      return {
+        x: Math.random() * canvas.width,
+        y: canvas.height + Math.random() * 50 + 20,
+        size: Math.random() * 8 + 5,
+        speedY: Math.random() * 0.8 + 0.4,
+        speedX: Math.sin(Math.random() * Math.PI) * 0.2,
+        opacity: Math.random() * 0.4 + 0.2,
+        angle: Math.random() * 360,
+        rotSpeed: (Math.random() - 0.5) * 0.4
+      };
+    };
+
+    for (let i = 0; i < maxFloating; i++) {
+      floatingHearts.push(createFloatingHeart());
+      // distribute them vertically at start
+      floatingHearts[i].y = Math.random() * canvas.height;
+    }
+
+    let pulseScale = 1;
+    let pulseDirection = 1;
+
+    const drawHeartShape = (context, x, y, size, opacity) => {
+      context.save();
+      context.beginPath();
+      context.translate(x, y);
+      context.rotate(Math.PI);
+      context.scale(size / 10, size / 10);
+      context.moveTo(0, 0);
+      context.bezierCurveTo(5, 5, 10, 2, 10, -5);
+      context.bezierCurveTo(10, -12, 0, -17, 0, -17);
+      context.bezierCurveTo(0, -17, -10, -12, -10, -5);
+      context.bezierCurveTo(-10, 2, -5, 5, 0, 0);
+      context.fillStyle = `rgba(255, 105, 180, ${opacity})`;
+      context.shadowBlur = 10;
+      context.shadowColor = 'pink';
+      context.fill();
+      context.restore();
+    };
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Heartbeat pulse calculation
+      pulseScale += 0.004 * pulseDirection;
+      if (pulseScale > 1.08) pulseDirection = -1;
+      if (pulseScale < 0.94) pulseDirection = 1;
+
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2 - 20;
+      // Adjust size based on width and height
+      const scale = Math.min(canvas.width, canvas.height) * 0.015 * pulseScale;
+
+      // 1. Draw floating hearts in background
+      floatingHearts.forEach((fh) => {
+        fh.y -= fh.speedY;
+        fh.x += fh.speedX;
+        fh.angle += fh.rotSpeed;
+
+        if (fh.y < -30) {
+          // Reset to bottom
+          const fresh = createFloatingHeart();
+          Object.assign(fh, fresh);
+        }
+
+        drawHeartShape(ctx, fh.x, fh.y, fh.size, fh.opacity);
+      });
+
+      // 2. Draw the main heart particles as text
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      particles.forEach((p, idx) => {
+        const hp = heartPoints[idx];
+        p.targetX = centerX + hp.x * scale;
+        p.targetY = centerY + hp.y * scale;
+
+        // Smoothly move towards the target
+        p.x += (p.targetX - p.x) * p.speed;
+        p.y += (p.targetY - p.y) * p.speed;
+
+        // Little breathing/vibrating movement
+        const offset = Math.sin(p.angle) * 1.2;
+        p.angle += p.pulseSpeed;
+
+        // Set font size
+        ctx.font = `bold ${p.fontSize}px 'Mitr', 'Sarabun', sans-serif`;
+        ctx.fillStyle = p.color;
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = 'rgba(255, 75, 92, 0.6)';
+
+        // Draw text
+        ctx.fillText("ไอติมรักปุ้มนะ", p.x + offset, p.y + offset);
+      });
+
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
+  return <canvas ref={canvasRef} style={{ width: '100%', height: '100%', display: 'block' }} />;
+};
+
 function App() {
   const [quote, setQuote] = useState({ text: "", author: "" });
   const [isVisible, setIsVisible] = useState(false);
@@ -478,9 +639,14 @@ function App() {
                 <Camera size={18} /> อัพโหลดความน่ารัก
               </button>
 
-              <button className="btn-gallery" onClick={() => setCurrentPage('gallery')}>
-                ดู Gallery 🖼️
-              </button>
+              <div className="button-group-vertical" style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', marginTop: '15px' }}>
+                <button className="btn-gallery" onClick={() => setCurrentPage('gallery')} style={{ margin: 0 }}>
+                  ดู Gallery ความน่ารัก 🖼️
+                </button>
+                <button className="btn-love-heart" onClick={() => { triggerConfetti(); setCurrentPage('heart-page'); }}>
+                  หัวใจรักปุ้มนะ 💖
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}
@@ -593,6 +759,27 @@ function App() {
                 )}
               </AnimatePresence>
             )}
+          </div>
+        </motion.div>
+      )}
+
+      {currentPage === 'heart-page' && (
+        <motion.div
+          className="heart-page-wrapper"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <button className="btn-back-absolute" onClick={() => setCurrentPage('home')}>
+            <X size={20} /> กลับหน้าหลัก
+          </button>
+
+          <div className="heart-canvas-container">
+            <HeartCanvas />
+            <div className="heart-text-overlay">
+              <p className="heart-sub-text">ตลอดไปและมากกว่าเดิมในทุกๆ วันนะคุณคนเก่ง 💕</p>
+            </div>
           </div>
         </motion.div>
       )}

@@ -21,6 +21,7 @@ A minimalist, premium, and heartfelt web application built to provide encouragem
   - **🏷️ Details & Control**: Each card has a clean hover overlay showing the uploader's name, precise Thai locale uploader timestamp (`th-TH`), and a delete button.
   - **🔍 Full-screen Blur Preview**: Click any image to view it in an elegant full-screen modal with background blur.
   - **💾 High-Res Download**: A dedicated button to save original, high-resolution uploaded images directly to the device.
+- **🖤 Heart-text Outline Page**: A dedicated romantic room featuring a glowing heart shape composed entirely of the repeating text "ไอติมรักปุ้มนะ" on a pure black background. The heart beats/pulsates in real-time, matching modern interactive web aesthetics.
 - **✨ Smooth Interactions**: Fluid page transitions, modal scales, and heart confetti animations powered by **Framer Motion** and **Canvas Confetti**.
 
 ---
