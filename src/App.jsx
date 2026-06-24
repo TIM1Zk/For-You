@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import quotesData from './data/quotes.json';
-import { Camera, Trash2, Send, Clock, User, Loader2, Download, X } from 'lucide-react';
+import { Camera, Trash2, Send, Clock, User, Loader2, Download, X, Play, Pause } from 'lucide-react';
 import { supabase } from './supabaseClient';
 
 const surpriseVideos = [
@@ -226,6 +226,32 @@ function App() {
 
   // NEW: Gallery Preview State
   const [selectedImg, setSelectedImg] = useState(null);
+
+  // AUDIO STATES
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const audioRef = useRef(null);
+
+  const togglePlayAudio = useCallback(() => {
+    if (!audioRef.current) return;
+    if (isPlayingAudio) {
+      audioRef.current.pause();
+      setIsPlayingAudio(false);
+    } else {
+      audioRef.current.play().then(() => {
+        setIsPlayingAudio(true);
+      }).catch(err => {
+        console.error("Audio playback failed:", err);
+        alert("กรุณาเพิ่มไฟล์เสียง 'voice.mp3' ไว้ในโฟลเดอร์ public ก่อนนะครับ");
+      });
+    }
+  }, [isPlayingAudio]);
+
+  useEffect(() => {
+    if (currentPage !== 'heart-page' && audioRef.current && isPlayingAudio) {
+      audioRef.current.pause();
+      setIsPlayingAudio(false);
+    }
+  }, [currentPage, isPlayingAudio]);
 
   const startDate = new Date(2026, 2, 25);
 
@@ -777,6 +803,26 @@ function App() {
 
           <div className="heart-canvas-container">
             <HeartCanvas />
+            <audio ref={audioRef} src="/voice.mp3" preload="auto" onEnded={() => setIsPlayingAudio(false)} />
+            
+            <div className="audio-player-container">
+              <button className={`btn-audio-play ${isPlayingAudio ? 'playing' : ''}`} onClick={togglePlayAudio}>
+                {isPlayingAudio ? <Pause size={24} fill="#fff" /> : <Play size={24} fill="#fff" />}
+              </button>
+              <div className="audio-status-text">
+                {isPlayingAudio ? 'กำลังเปิดเสียงข้อความรัก...' : 'กดเพื่อฟังเสียงข้อความรัก 💌'}
+              </div>
+              {isPlayingAudio && (
+                <div className="audio-wave">
+                  <span className="wave-bar"></span>
+                  <span className="wave-bar"></span>
+                  <span className="wave-bar"></span>
+                  <span className="wave-bar"></span>
+                  <span className="wave-bar"></span>
+                </div>
+              )}
+            </div>
+
             <div className="heart-text-overlay">
               <p className="heart-sub-text">ตลอดไปและมากกว่าเดิมในทุกๆ วันนะคุณคนเก่ง 💕</p>
             </div>

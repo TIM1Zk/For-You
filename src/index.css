@@ -1374,3 +1374,113 @@ body {
     font-size: 0.9rem;
   }
 }
+
+/* Audio Player on Heart Page */
+.audio-player-container {
+  position: absolute;
+  bottom: 18%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  z-index: 70;
+}
+
+.btn-audio-play {
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 4px 20px rgba(255, 117, 140, 0.4), 0 0 0 4px rgba(255, 255, 255, 0.1);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-audio-play svg {
+  margin-left: 2px; /* Slight offset for centering the play triangle icon visually */
+}
+
+.btn-audio-play.playing svg {
+  margin-left: 0; /* Reset offset when paused icon is showing */
+}
+
+.btn-audio-play:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 25px rgba(255, 117, 140, 0.6), 0 0 0 6px rgba(255, 255, 255, 0.15);
+}
+
+.btn-audio-play.playing {
+  animation: pulse-border 1.5s infinite;
+}
+
+@keyframes pulse-border {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 117, 140, 0.7), 0 0 0 4px rgba(255, 255, 255, 0.1);
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(255, 117, 140, 0), 0 0 0 8px rgba(255, 255, 255, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 117, 140, 0), 0 0 0 4px rgba(255, 255, 255, 0.1);
+  }
+}
+
+.audio-status-text {
+  font-family: 'Mitr', sans-serif;
+  color: #ffb7c5;
+  font-size: 0.9rem;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 8px rgba(255, 117, 140, 0.3);
+}
+
+/* Audio Wave Visualizer */
+.audio-wave {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 22px;
+  margin-top: 5px;
+}
+
+.wave-bar {
+  width: 3px;
+  height: 100%;
+  background-color: #ff758c;
+  border-radius: 3px;
+  animation: bounce-wave 1s ease-in-out infinite alternate;
+}
+
+.wave-bar:nth-child(1) {
+  animation-duration: 0.8s;
+}
+.wave-bar:nth-child(2) {
+  animation-duration: 1.1s;
+  animation-delay: 0.2s;
+}
+.wave-bar:nth-child(3) {
+  animation-duration: 0.9s;
+  animation-delay: 0.4s;
+}
+.wave-bar:nth-child(4) {
+  animation-duration: 1.2s;
+  animation-delay: 0.1s;
+}
+.wave-bar:nth-child(5) {
+  animation-duration: 0.7s;
+  animation-delay: 0.3s;
+}
+
+@keyframes bounce-wave {
+  0% {
+    height: 4px;
+  }
+  100% {
+    height: 22px;
+  }
+}
