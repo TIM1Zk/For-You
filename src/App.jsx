@@ -395,7 +395,6 @@ function App() {
 
       if (progress >= 100) {
         clearInterval(holdIntervalRef.current);
-        triggerConfetti();
         setCurrentPage('heart-page');
         setHoldProgress(0);
         setIsHolding(false);
