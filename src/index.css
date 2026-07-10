@@ -82,17 +82,17 @@ body {
 
 /* Glass Card */
 .quote-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  border: 1px solid var(--glass-border);
-  border-radius: 24px;
-  padding: 3rem;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 28px;
+  padding: 3rem 2.5rem;
   width: 95%;
-  max-width: 500px;
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+  max-width: 480px;
+  box-shadow: 0 20px 45px rgba(255, 183, 197, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.4) inset;
   text-align: center;
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   opacity: 0;
   transform: translateY(20px);
   animation: fadeIn 0.8s forwards ease-out;
@@ -107,75 +107,80 @@ body {
 
 .quote-text {
   font-family: 'Mitr', sans-serif;
-  font-size: 1.5rem;
+  font-size: 1.45rem;
   font-weight: 300;
   line-height: 1.6;
-  margin-bottom: 2rem;
-  color: #333;
+  margin-bottom: 1.8rem;
+  color: #2d2d2d;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .quote-author {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 400;
-  color: #888;
-  letter-spacing: 1px;
+  color: #9c9c9c;
+  letter-spacing: 1.5px;
   text-transform: uppercase;
-  margin-bottom: 2rem;
+  margin-bottom: 2.2rem;
 }
 
 /* Button Styling */
 .btn-primary {
   background: white;
   color: var(--text-color);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  padding: 12px 30px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 12px 28px;
   border-radius: 50px;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
   font-family: 'Inter', 'Sarabun', sans-serif;
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 15px rgba(255, 183, 197, 0.3);
   background: var(--primary-accent);
   color: white;
   border-color: transparent;
 }
 
 .btn-primary:active {
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
 }
 
 .btn-special {
   background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
   color: white;
   border: none;
-  padding: 12px 30px;
+  padding: 12px 28px;
   border-radius: 50px;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 15px rgba(255, 154, 158, 0.25);
   font-family: 'Inter', 'Sarabun', sans-serif;
-  margin-left: 10px;
+  margin-left: 8px;
 }
 
 .btn-special:hover {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 6px 20px rgba(255, 154, 158, 0.5);
-  filter: brightness(1.1);
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 8px 22px rgba(255, 154, 158, 0.45);
+  filter: brightness(1.05);
+}
+
+.btn-special:active {
+  transform: translateY(0) scale(1);
 }
 
 .button-group {
   display: flex;
   justify-content: center;
   gap: 10px;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
 }
 
 /* Transition classes for React */
@@ -335,31 +340,35 @@ body {
 }
 
 .btn-upload-toggle {
-  margin-top: 20px;
-  background: none;
-  border: 1px dashed var(--primary-accent);
-  color: var(--primary-accent);
-  padding: 8px 16px;
-  border-radius: 12px;
+  margin-top: 18px;
+  background: rgba(255, 183, 197, 0.04);
+  border: 1.5px dashed var(--primary-accent);
+  color: #ff758c;
+  padding: 9px 18px;
+  border-radius: 14px;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  font-size: 0.85rem;
-  margin-left: auto;
-  margin-right: auto;
-  transition: all 0.3s;
+  font-size: 0.88rem;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: inherit;
 }
 
 .btn-upload-toggle:hover {
   background: var(--primary-accent);
   color: white;
+  border-style: solid;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(255, 183, 197, 0.25);
 }
 
 .btn-gallery {
   margin-top: 15px;
   background: linear-gradient(to right, #ffffff, #fdfbfb);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.06);
   color: #4b5563;
   padding: 12px 20px;
   border-radius: 14px;
@@ -371,8 +380,8 @@ body {
   font-size: 0.95rem;
   font-weight: 500;
   width: 100%;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
   font-family: inherit;
 }
 
@@ -744,13 +753,13 @@ body {
   width: 130px;
   height: 130px;
   border-radius: 50%;
-  padding: 6px;
+  padding: 5px;
   background: white;
-  box-shadow: 0 10px 30px rgba(255, 183, 197, 0.3);
+  box-shadow: 0 10px 30px rgba(255, 183, 197, 0.22), 0 0 0 3px rgba(255, 255, 255, 0.8);
   cursor: pointer;
   transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   overflow: hidden;
-  border: 4px solid rgba(255, 255, 255, 1);
+  border: 3.5px solid var(--primary-accent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -765,13 +774,14 @@ body {
   right: 0;
   bottom: 0;
   border-radius: 50%;
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.04);
   pointer-events: none;
 }
 
 .photo-frame:hover {
-  transform: scale(1.1) rotate(5deg);
-  box-shadow: 0 15px 40px rgba(255, 183, 197, 0.5);
+  transform: scale(1.08) rotate(3deg);
+  box-shadow: 0 15px 35px rgba(255, 183, 197, 0.35), 0 0 0 5px rgba(255, 183, 197, 0.15);
+  border-color: #ff758c;
 }
 
 .couple-photo {
@@ -779,6 +789,11 @@ body {
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
+  transition: transform 0.5s ease;
+}
+
+.photo-frame:hover .couple-photo {
+  transform: scale(1.05);
 }
 
 .photo-placeholder {
@@ -1164,6 +1179,7 @@ body {
   font-size: 0.95rem;
   line-height: 1.8;
   color: #4a4a4a;
+  text-align: center !important;
 }
 
 /* Mobile responsive adjustments */
@@ -1482,5 +1498,183 @@ body {
   }
   100% {
     height: 22px;
+  }
+}
+
+/* Circular progress hold button on gate page */
+.btn-hold-heart {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  background: rgba(10, 4, 15, 0.8);
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  transition: all 0.3s;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.svg-progress {
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  width: 120px;
+  height: 120px;
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
+
+.circle-track {
+  fill: transparent;
+  stroke: rgba(255, 255, 255, 0.05);
+  stroke-width: 5;
+}
+
+.circle-fill {
+  fill: transparent;
+  stroke: #ff758c;
+  stroke-width: 5;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.05s linear;
+}
+
+.gate-heart-icon {
+  color: #ff4b5c;
+  fill: transparent;
+  transition: all 0.3s;
+  animation: heart-pulse-gate 1.2s infinite alternate ease-in-out;
+}
+
+.gate-heart-icon.holding {
+  transform: scale(1.25);
+  fill: #ff4b5c;
+  filter: drop-shadow(0 0 12px #ff4b5c);
+}
+
+@keyframes heart-pulse-gate {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.12); }
+}
+
+.hold-glow {
+  position: absolute;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 117, 140, 0.2) 0%, rgba(255, 117, 140, 0) 70%);
+  filter: blur(10px);
+  z-index: 10;
+  transition: all 0.5s;
+}
+
+.hold-glow.holding {
+  transform: scale(1.3);
+  background: radial-gradient(circle, rgba(255, 117, 140, 0.35) 0%, rgba(255, 117, 140, 0) 70%);
+}
+
+.hold-label {
+  font-family: 'Mitr', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 300;
+  color: #ffb7c5;
+  margin-top: 30px;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 8px rgba(255, 117, 140, 0.4);
+}
+
+/* Space Nebula Background Glow */
+.nebula-glow {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  filter: blur(130px);
+  opacity: 0.22;
+  pointer-events: none;
+  z-index: 1;
+}
+.nebula-pink {
+  background: radial-gradient(circle, #ff758c 0%, rgba(255, 117, 140, 0) 70%);
+  top: -15%;
+  left: -15%;
+}
+.nebula-blue {
+  background: radial-gradient(circle, #a1c4fd 0%, rgba(161, 196, 253, 0) 70%);
+  bottom: -15%;
+  right: -15%;
+}
+
+/* Floating Audio Control in Top Right Corner */
+.btn-audio-top-right {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffb7c5;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  z-index: 80;
+  transition: all 0.3s ease;
+}
+
+.btn-audio-top-right:hover {
+  transform: scale(1.08);
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 117, 140, 0.4);
+  box-shadow: 0 4px 20px rgba(255, 117, 140, 0.3);
+  color: #ff758c;
+}
+
+.btn-audio-top-right.playing {
+  animation: pulse-audio-icon 2s infinite ease-in-out;
+}
+
+@keyframes pulse-audio-icon {
+  0% { box-shadow: 0 0 0 0 rgba(255, 117, 140, 0.4), 0 4px 15px rgba(0, 0, 0, 0.3); }
+  70% { box-shadow: 0 0 0 10px rgba(255, 117, 140, 0), 0 4px 15px rgba(0, 0, 0, 0.3); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 117, 140, 0), 0 4px 15px rgba(0, 0, 0, 0.3); }
+}
+
+/* Neon Glowing Title for Happy Anniversary */
+.heart-title-glow {
+  font-family: 'Mitr', sans-serif;
+  font-weight: 600;
+  letter-spacing: 3px;
+  background: linear-gradient(135deg, #ffffff 0%, #ffb7c5 45%, #ff758c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: title-glow-pulse 2s infinite alternate ease-in-out;
+  text-align: center;
+}
+
+@keyframes title-glow-pulse {
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 10px rgba(255, 117, 140, 0.4));
+  }
+  100% {
+    transform: scale(1.04);
+    filter: drop-shadow(0 0 25px rgba(255, 117, 140, 0.7));
+  }
+}
+
+@media (max-width: 600px) {
+  .heart-title-glow {
+    font-size: 2.2rem !important;
+    letter-spacing: 1px;
   }
 }
