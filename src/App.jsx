@@ -905,66 +905,58 @@ function App() {
 
         {currentPage === 'gallery' && (
           <motion.div
-            className="gallery-page-wrapper"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 30 }}
-            transition={{ duration: 0.4 }}
+            className="gallery-page"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
           >
+            <div className="blob" style={{ opacity: 0.5 }}></div>
+            <div className="blob blob-2" style={{ opacity: 0.5 }}></div>
             <div className="gallery-header">
-              <h2 className="gallery-title">คลังความรักของเรา 🖼️</h2>
-              <button className="btn-back" onClick={() => setCurrentPage('home')}>
-                <X size={20} /> ย้อนกลับ
-              </button>
+              <h2>Gallery ความน่ารัก ✨</h2>
+              <button className="btn-back" onClick={() => setCurrentPage('home')}>กลับ</button>
             </div>
-
-            {isLoadingImages ? (
-              <div className="loader-container">
-                <Loader2 className="animate-spin text-pink-500" size={40} />
-                <p>กำลังดึงความทรงจำแสนหวาน...</p>
-              </div>
-            ) : (
-              <AnimatePresence>
-                {images.length === 0 ? (
-                  <div className="empty-gallery">
-                    <p>ยังไม่มีรูปภาพในคลังความทรงจำเลย...</p>
-                    <p className="sub-empty">กดปุ่ม "อัพโหลดความน่ารัก" ในหน้าแรกเพื่อบันทึกรูปแรกกันเถอะ! 📸</p>
-                  </div>
-                ) : (
-                  <div className="gallery-grid">
-                    {images.map((img) => (
+            <div className="gallery-full-container">
+              {isLoadingImages ? (
+                <div style={{ width: '100%', textAlign: 'center', marginTop: '50px', color: '#888' }}>
+                  <Loader2 className="animate-spin" size={30} style={{ margin: '0 auto', marginBottom: '10px' }} />
+                  <p>กำลังโหลดความน่ารัก...</p>
+                </div>
+              ) : (
+                <AnimatePresence>
+                  {images.length === 0 ? (
+                    <div style={{ width: '100%', textAlign: 'center', marginTop: '50px', color: '#aaa', gridColumn: '1 / -1' }}>
+                      <p>ยังไม่มีรูปภาพใน Gallery เลย ลองอัพโหลดเป็นคนแรกสิ! ✨</p>
+                    </div>
+                  ) : (
+                    images.map((img) => (
                       <motion.div
                         key={img.id}
-                        className="gallery-item-card"
-                        initial={{ opacity: 0, scale: 0.9 }}
+                        className="gallery-item"
+                        initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                        whileHover={{ y: -5 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        layout
+                        onClick={() => setSelectedImg(img.url)}
+                        style={{ cursor: 'zoom-in' }}
                       >
-                        <div className="gallery-img-container" onClick={() => setSelectedImg(img.url)}>
-                          <img src={img.url} alt={img.name} className="gallery-img" />
-                        </div>
+                        <img src={img.url} alt={img.name} className="gallery-img" loading="lazy" />
                         <div className="gallery-info">
-                          <h3 className="img-title">{img.name}</h3>
-                          <div className="gallery-meta">
-                            <span className="upload-date">
-                              {new Date(img.created_at).toLocaleDateString('th-TH', {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric'
-                              })}
-                            </span>
-                            <button className="btn-delete" onClick={() => handleDeleteImage(img.id, img.url)}>
-                              <Trash2 size={16} />
-                            </button>
-                          </div>
+                          <p className="img-name"><User size={12} /> {img.name}</p>
+                          <p className="img-time"><Clock size={12} /> {img.timestamp}</p>
+                          <button className="btn-delete" onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteImage(img.id, img.url);
+                          }}>
+                            <Trash2 size={14} />
+                          </button>
                         </div>
                       </motion.div>
-                    ))}
-                  </div>
-                )}
-              </AnimatePresence>
-            )}
+                    ))
+                  )}
+                </AnimatePresence>
+              )}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
