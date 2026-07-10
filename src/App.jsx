@@ -519,10 +519,19 @@ function App() {
 
   const loadCouplePhotos = async () => {
     try {
-      const { data: leftData } = await supabase.storage.from('couple-photos').createSignedUrl('left.jpg', 60);
-      if (leftData?.signedUrl) setLeftImg(leftData.signedUrl);
-      const { data: rightData } = await supabase.storage.from('couple-photos').createSignedUrl('right.jpg', 60);
-      if (rightData?.signedUrl) setRightImg(rightData.signedUrl);
+      const { data, error } = await supabase
+        .from('images')
+        .select('*')
+        .in('name', ['__LOVE_LEFT__', '__LOVE_RIGHT__'])
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      
+      const left = data.find(img => img.name === '__LOVE_LEFT__');
+      const right = data.find(img => img.name === '__LOVE_RIGHT__');
+      
+      if (left) setLeftImg(left.url);
+      if (right) setRightImg(right.url);
     } catch (e) {
       console.log('Error loading couple photos from Supabase, using local settings');
     }
@@ -532,26 +541,14 @@ function App() {
     setIsLoadingImages(true);
     try {
       const { data, error } = await supabase
-        .from('gallery')
+        .from('images')
         .select('*')
+        .not('name', 'ilike', '__LOVE_%')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      const imagesWithUrls = await Promise.all(data.map(async (img) => {
-        const { data: signedData, error: urlError } = await supabase
-          .storage
-          .from('gallery-images')
-          .createSignedUrl(img.file_path, 3600);
-
-        if (urlError) {
-          console.error("Error creating signed URL for", img.file_path, urlError);
-          return { ...img, url: null };
-        }
-        return { ...img, url: signedData.signedUrl };
-      }));
-
-      setImages(imagesWithUrls.filter(img => img.url !== null));
+      setImages(data);
     } catch (error) {
       console.error('Error fetching images:', error.message);
     } finally {
@@ -563,29 +560,52 @@ function App() {
     const file = e.target.files[0];
     if (!file) return;
 
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${position}.${fileExt}`;
-    const filePath = fileName;
+    if (!file.type.startsWith('image/')) {
+      alert("กรุณาเลือกเฉพาะไฟล์รูปภาพเท่านั้น");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      alert("ขนาดไฟล์รูปภาพใหญ่เกินไป (สูงสุด 5MB)");
+      return;
+    }
 
+    setIsUploading(true);
     try {
+      const fileExt = file.name.split('.').pop() || 'jpg';
+      const storagePath = `system/love_${position}_${Date.now()}.${fileExt}`;
+
       const { error: uploadError } = await supabase.storage
-        .from('couple-photos')
-        .upload(filePath, file, { upsert: true });
+        .from('gallery')
+        .upload(storagePath, file);
 
       if (uploadError) throw uploadError;
 
-      const { data } = await supabase.storage
-        .from('couple-photos')
-        .createSignedUrl(filePath, 60);
+      const { data: { publicUrl } } = supabase.storage
+        .from('gallery')
+        .getPublicUrl(storagePath);
+
+      const systemName = position === 'left' ? '__LOVE_LEFT__' : '__LOVE_RIGHT__';
+      const timestamp = new Date().toLocaleString('th-TH', {
+        year: 'numeric', month: 'short', day: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
+
+      const { error: dbError } = await supabase
+        .from('images')
+        .insert([{ name: systemName, url: publicUrl, timestamp: timestamp }]);
+
+      if (dbError) throw dbError;
 
       if (position === 'left') {
-        setLeftImg(data.signedUrl);
+        setLeftImg(publicUrl);
       } else {
-        setRightImg(data.signedUrl);
+        setRightImg(publicUrl);
       }
       triggerConfetti();
     } catch (error) {
       alert('อัพโหลดรูปภาพไม่สำเร็จ: ' + error.message);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -603,22 +623,31 @@ function App() {
 
     setIsUploading(true);
     try {
-      const fileExt = imageFile.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `${fileName}`;
+      const fileExt = imageFile.name.split('.').pop() || 'jpg';
+      const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('gallery-images')
-        .upload(filePath, imageFile);
+        .from('gallery')
+        .upload(fileName, imageFile);
 
       if (uploadError) throw uploadError;
 
-      const { error: dbError } = await supabase
+      const { data: { publicUrl } } = supabase.storage
         .from('gallery')
+        .getPublicUrl(fileName);
+
+      const timestamp = new Date().toLocaleString('th-TH', {
+        year: 'numeric', month: 'short', day: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
+
+      const { error: dbError } = await supabase
+        .from('images')
         .insert([
           { 
             name: imageName, 
-            file_path: filePath 
+            url: publicUrl, 
+            timestamp: timestamp 
           }
         ]);
 
@@ -637,18 +666,19 @@ function App() {
     }
   };
 
-  const handleDeleteImage = async (id, filePath) => {
+  const handleDeleteImage = async (id, url) => {
     if (!window.confirm('คุณแน่ใจหรอว่าจะลบรูปความทรงจำนี้น่ะ?🥺')) return;
 
     try {
+      const fileName = url.split('/').pop();
       const { error: storageError } = await supabase.storage
-        .from('gallery-images')
-        .remove([filePath]);
+        .from('gallery')
+        .remove([fileName]);
 
       if (storageError) throw storageError;
 
       const { error: dbError } = await supabase
-        .from('gallery')
+        .from('images')
         .delete()
         .eq('id', id);
 
@@ -924,7 +954,7 @@ function App() {
                                 day: 'numeric'
                               })}
                             </span>
-                            <button className="btn-delete" onClick={() => handleDeleteImage(img.id, img.file_path)}>
+                            <button className="btn-delete" onClick={() => handleDeleteImage(img.id, img.url)}>
                               <Trash2 size={16} />
                             </button>
                           </div>
@@ -1049,6 +1079,7 @@ function App() {
             <audio ref={audioRef} src="/voice-vhs.wav" preload="auto" onEnded={() => setIsPlayingAudio(false)} />
             
             <div className="heart-text-overlay">
+
               <p className="heart-sub-text">ตลอดไปและมากกว่าเดิมในทุกๆ วันนะคุณคนเก่ง 💕</p>
             </div>
           </div>
