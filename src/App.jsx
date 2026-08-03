@@ -691,15 +691,28 @@ function App() {
 
   useEffect(() => {
     const calcDuration = () => {
-      const diff = new Date() - startDate;
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      
-      let years = Math.floor(days / 365);
-      let remDays = days % 365;
-      let months = Math.floor(remDays / 30);
-      let finalDays = remDays % 30;
+      const now = new Date();
+      let years = now.getFullYear() - startDate.getFullYear();
+      let months = now.getMonth() - startDate.getMonth();
+      let days = now.getDate() - startDate.getDate();
 
-      setLoveDuration({ years, months, days: finalDays });
+      if (days < 0) {
+        months -= 1;
+        const prevMonthLastDay = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+        const effectiveStartDay = Math.min(startDate.getDate(), prevMonthLastDay);
+        days = now.getDate() + (prevMonthLastDay - effectiveStartDay);
+      }
+
+      if (months < 0) {
+        years -= 1;
+        months += 12;
+      }
+
+      setLoveDuration({
+        years: Math.max(0, years),
+        months: Math.max(0, months),
+        days: Math.max(0, days)
+      });
     };
 
     calcDuration();

@@ -8,8 +8,8 @@ A minimalist, premium, and heartfelt web application built to provide encouragem
 
 - **🎨 "Less is More" Aesthetic**: Clean glassmorphism design with soft, dynamic background elements (moving blobs) creating a calm and focused atmosphere.
 - **💖 Dynamic Love Counter**: A heartwarming anniversary counter tracking elapsed time since **March 25, 2026**, featuring a large, vibrant gradient display.
-  - **📅 Smart Time Scaling**: The counter dynamically scales from days to months and years as time passes.
-  - **🕒 Local Time Accuracy**: Precision calculations ensure the counter increments exactly at **Midnight (00:00)** according to local Bangkok time, avoiding UTC offset delays.
+  - **📅 Smart Calendar Precision**: Calculates exact elapsed years, months, and days based on real calendar month lengths (handling 28, 29, 30, and 31-day months accurately instead of rough day approximations).
+  - **🕒 Local Time Accuracy**: Precision calculations update seamlessly according to local Bangkok time.
   - **📸 Couple Avatar Cards**: Two interactive shared photo slots (`Me` & `You`). Uploading a photo updates it for everyone instantly using **Supabase Database & Storage**.
 - **🎁 Anniversary Surprise Gift Box**: A cute, floating, and shaking gift box 🎁 that triggers:
   - **🎞️ Precious Memories Video**: A gorgeous responsive modal displaying a surprise anniversary YouTube video.
