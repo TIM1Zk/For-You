@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import quotesData from './data/quotes.json';
-import { Camera, Trash2, Send, Clock, User, Loader2, Download, X, Play, Pause, Heart } from 'lucide-react';
+import { Camera, Trash2, Send, Clock, User, Loader2, Download, X, Play, Pause, Heart, Sprout, Sparkles, Droplets, Sun, RefreshCw } from 'lucide-react';
 import { supabase } from './supabaseClient';
 
 const surpriseVideos = [
@@ -376,7 +376,66 @@ function App() {
   // AUDIO STATES
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const audioRef = useRef(null);
-  
+
+  // VIRTUAL GARDEN (OUR PLANT) STATES
+  const [waterCount, setWaterCount] = useState(() => {
+    const saved = localStorage.getItem('love_garden_water_count');
+    return saved ? parseInt(saved, 10) : 0;
+  });
+  const [isWatering, setIsWatering] = useState(false);
+  const [gardenMessage, setGardenMessage] = useState(null);
+  const [waterDrops, setWaterDrops] = useState([]);
+
+  const gardenLoveNotes = [
+    "ต้นไม้กระซิบบอกว่า ดีใจจังที่ได้เติบโตไปพร้อมความรักของไอติมกับปุ้มนะ 🌸",
+    "รดน้ำความรักเรียบร้อย! วันนี้ไอติมคิดถึงปุ้มมากๆ เลยนะคนเก่ง 💖",
+    "ดอกไม้ส่งกลิ่นหอมและกำลังใจไปให้ปุ้มอ่านหนังสือสอบแล้วนะ สู้ๆ! 📚✨",
+    "ความรักตลอด 5 เดือนของเราเบ่งบานสดใสขึ้นทุกๆ วันเลย 🌷",
+    "ปุ้มยิ้มหน่อยน้า รอยยิ้มของคุณทำให้ต้นไม้และโลกของเค้าสดใสที่สุดเลย 🥰",
+    "5 เดือนแล้วนะ ขอบคุณที่น่ารักและคอยจับมือกันในทุกๆ วันนะคับ 🪐",
+    "ต้นไม้บอกว่า เจ้าของต้นไม้นี้ (ปุ้ม) น่ารักที่สุดในจักรวาลเลย! 🌻",
+    "พลังใจ +100% ส่งตรงจากใจไอติมถึงคนดีของเค้าแล้ว ❤️"
+  ];
+
+  const handleWaterPlant = () => {
+    if (isWatering) return;
+    setIsWatering(true);
+
+    // Create 8 drops
+    const drops = Array.from({ length: 8 }).map((_, i) => ({
+      id: Date.now() + i,
+      x: Math.random() * 80 + 10,
+      delay: Math.random() * 0.4
+    }));
+    setWaterDrops(drops);
+
+    const newCount = waterCount + 1;
+    setWaterCount(newCount);
+    localStorage.setItem('love_garden_water_count', newCount.toString());
+
+    // Random message
+    const randomNote = gardenLoveNotes[Math.floor(Math.random() * gardenLoveNotes.length)];
+    setGardenMessage(randomNote);
+
+    // Heart Confetti when blooming / milestone
+    if (newCount === 5 || newCount % 10 === 0) {
+      triggerConfetti();
+    }
+
+    setTimeout(() => {
+      setIsWatering(false);
+      setWaterDrops([]);
+    }, 1500);
+  };
+
+  const getPlantStage = (count) => {
+    if (count < 2) return { stage: 1, name: "เมล็ดพันธุ์แห่งรัก 🌱", desc: "จุดเริ่มต้นความรักที่แสนอบอุ่น", percent: Math.min(100, (count / 2) * 100) };
+    if (count < 5) return { stage: 2, name: "ต้นกล้าหัวใจ 🌿", desc: "เริ่มผลิใบอ่อนรูปหัวใจทีละนิด", percent: Math.min(100, ((count - 2) / 3) * 100) };
+    if (count < 9) return { stage: 3, name: "ดอกไม้ตูมแห่งความทรงจำ 🌷", desc: "เริ่มเตรียมบานรับวันครบรอบ", percent: Math.min(100, ((count - 5) / 4) * 100) };
+    if (count < 15) return { stage: 4, name: "ดอกไม้ 5 เดือนบานสะพรั่ง 🌸", desc: "ความรัก 5 เดือนที่งดงามและสดใส", percent: Math.min(100, ((count - 9) / 6) * 100) };
+    return { stage: 5, name: "สวนแห่งรักนิรันดร์ 💖✨", desc: "ความรักที่เบ่งบานเต็มหัวใจและไม่มีวันร่วงโรย", percent: 100 };
+  };
+
   // HOLD HEART GAGE STATES
   const holdIntervalRef = useRef(null);
   const [holdProgress, setHoldProgress] = useState(0);
@@ -855,6 +914,9 @@ function App() {
               </button>
 
               <div className="button-group-vertical" style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', marginTop: '15px' }}>
+                <button className="btn-garden" onClick={() => setCurrentPage('garden')} style={{ margin: 0 }}>
+                  <Sprout size={18} style={{ marginRight: '6px' }} /> สวนความรัก 5 เดือน 🪴
+                </button>
                 <button className="btn-gallery" onClick={() => setCurrentPage('gallery')} style={{ margin: 0 }}>
                   ดู Gallery ความน่ารัก 🖼️
                 </button>
@@ -1052,6 +1114,351 @@ function App() {
               <span className="hold-label">
                 {isHolding ? 'กำลังส่งความรัก...' : 'กดหัวใจค้างไว้เพื่อเข้าสู่ระบบ 💖'}
               </span>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* VIRTUAL GARDEN PAGE */}
+      {currentPage === 'garden' && (
+        <motion.div
+          className="garden-page-wrapper"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <button className="btn-back-absolute" onClick={() => setCurrentPage('home')}>
+            <X size={20} /> กลับหน้าหลัก
+          </button>
+
+          <div className="garden-glow-sun"></div>
+          <div className="garden-glow-soil"></div>
+
+          <div className="garden-content-container">
+            <div className="garden-header">
+              <motion.div
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                className="garden-badge"
+              >
+                <Sparkles size={14} /> 5-Month Anniversary Garden
+              </motion.div>
+              <motion.h1 
+                className="garden-title"
+                initial={{ y: -10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.1 }}
+              >
+                สวนความรักของเรา 🌱🌸
+              </motion.h1>
+              <p className="garden-subtitle">
+                รดน้ำความรักเพื่อดูแลให้ต้นไม้ของเราเติบโตไปด้วยกันในทุกๆ วันนะ
+              </p>
+            </div>
+
+            {/* Plant Display Stage */}
+            <div className="plant-display-stage">
+              {/* Floating Butterflies when blooming (Stage >= 3) */}
+              {getPlantStage(waterCount).stage >= 3 && (
+                <>
+                  <div className="butterfly butterfly-1">🦋</div>
+                  <div className="butterfly butterfly-2">✨</div>
+                </>
+              )}
+
+              {/* Water Drops Animation */}
+              <AnimatePresence>
+                {waterDrops.map((drop) => (
+                  <motion.div
+                    key={drop.id}
+                    className="water-drop-particle"
+                    style={{ left: `${drop.x}%` }}
+                    initial={{ y: -40, opacity: 0, scale: 0.5 }}
+                    animate={{ y: 150, opacity: 1, scale: [0.8, 1.2, 0.4] }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.8, delay: drop.delay, ease: 'easeInOut' }}
+                  >
+                    💧
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+
+              {/* Plant Pot & Illustration */}
+              <div className={`plant-illustration-box ${isWatering ? 'plant-receiving-water' : ''}`}>
+                {/* SVG Botanical Art for Stages */}
+                <div className="plant-graphics-container">
+                  {getPlantStage(waterCount).stage === 1 && (
+                    <motion.div 
+                      key="stage-1"
+                      className="plant-stage-art stage-1"
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <svg viewBox="0 0 200 200" className="plant-svg">
+                        <defs>
+                          <linearGradient id="sproutGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+                            <stop offset="0%" stopColor="#43a047" />
+                            <stop offset="100%" stopColor="#81c784" />
+                          </linearGradient>
+                          <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#aed581" />
+                            <stop offset="100%" stopColor="#689f38" />
+                          </linearGradient>
+                        </defs>
+                        {/* Sprout Main Stem */}
+                        <path d="M 100 190 Q 98 140 100 105" stroke="url(#sproutGrad)" strokeWidth="8" strokeLinecap="round" fill="none" />
+                        {/* Left Heart Leaf */}
+                        <path d="M 100 120 C 70 105 55 75 75 60 C 95 48 100 85 100 110 Z" fill="url(#leafGrad)" />
+                        {/* Right Heart Leaf */}
+                        <path d="M 100 110 C 125 95 145 70 125 55 C 105 45 100 80 100 105 Z" fill="url(#leafGrad)" />
+                        {/* Central Little Heart Seedling */}
+                        <path d="M 100 80 C 94 68 82 72 85 82 C 88 92 100 100 100 100 C 100 100 112 92 115 82 C 118 72 106 68 100 80 Z" fill="#ff758c" />
+                      </svg>
+                    </motion.div>
+                  )}
+
+                  {getPlantStage(waterCount).stage === 2 && (
+                    <motion.div 
+                      key="stage-2"
+                      className="plant-stage-art stage-2"
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <svg viewBox="0 0 200 200" className="plant-svg">
+                        <defs>
+                          <linearGradient id="stemGrad2" x1="0%" y1="100%" x2="0%" y2="0%">
+                            <stop offset="0%" stopColor="#2e7d32" />
+                            <stop offset="100%" stopColor="#66bb6a" />
+                          </linearGradient>
+                        </defs>
+                        {/* Main Stem */}
+                        <path d="M 100 190 Q 94 130 100 70" stroke="url(#stemGrad2)" strokeWidth="8" strokeLinecap="round" fill="none" />
+                        {/* Left Branch & Heart Leaf */}
+                        <path d="M 97 135 Q 70 125 50 115" stroke="url(#stemGrad2)" strokeWidth="6" strokeLinecap="round" fill="none" />
+                        <path d="M 50 115 C 25 95 30 65 60 75 C 78 82 70 110 50 115 Z" fill="#7cb342" />
+                        {/* Right Branch & Heart Leaf */}
+                        <path d="M 98 115 Q 130 105 150 90" stroke="url(#stemGrad2)" strokeWidth="6" strokeLinecap="round" fill="none" />
+                        <path d="M 150 90 C 175 70 170 40 140 50 C 122 58 130 85 150 90 Z" fill="#8bc34a" />
+                        {/* Top Heart Blossom */}
+                        <path d="M 100 70 C 88 50 72 55 78 70 C 85 85 100 95 100 95 C 100 95 115 85 122 70 C 128 55 112 50 100 70 Z" fill="#ff758c" />
+                      </svg>
+                    </motion.div>
+                  )}
+
+                  {getPlantStage(waterCount).stage === 3 && (
+                    <motion.div 
+                      key="stage-3"
+                      className="plant-stage-art stage-3"
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <svg viewBox="0 0 200 200" className="plant-svg">
+                        <defs>
+                          <linearGradient id="roseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#ff4081" />
+                            <stop offset="100%" stopColor="#f50057" />
+                          </linearGradient>
+                        </defs>
+                        {/* Main Stems */}
+                        <path d="M 100 190 Q 92 125 100 65" stroke="#33691e" strokeWidth="9" strokeLinecap="round" fill="none" />
+                        <path d="M 96 130 Q 60 120 40 95" stroke="#558b2f" strokeWidth="6" strokeLinecap="round" fill="none" />
+                        <path d="M 100 110 Q 140 100 160 75" stroke="#558b2f" strokeWidth="6" strokeLinecap="round" fill="none" />
+                        
+                        {/* Leaves */}
+                        <path d="M 40 95 C 10 80 20 45 50 55 C 68 62 60 90 40 95 Z" fill="#689f38" />
+                        <path d="M 160 75 C 190 60 180 25 150 35 C 132 42 140 70 160 75 Z" fill="#7cb342" />
+                        
+                        {/* Blooming Rosebud */}
+                        <path d="M 100 65 C 75 40 75 10 100 5 C 125 10 125 40 100 65 Z" fill="url(#roseGrad)" />
+                        <path d="M 90 45 C 70 25 80 8 95 18 C 102 26 95 38 90 45 Z" fill="#ff80ab" />
+                        <path d="M 110 45 C 130 25 120 8 105 18 C 98 26 105 38 110 45 Z" fill="#ff758c" />
+                      </svg>
+                    </motion.div>
+                  )}
+
+                  {getPlantStage(waterCount).stage >= 4 && (
+                    <motion.div 
+                      key="stage-4"
+                      className="plant-stage-art stage-4"
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <svg viewBox="0 0 200 200" className="plant-svg glowing-flower-svg">
+                        <defs>
+                          {/* Radial gradient for soft glowing backdrop */}
+                          <radialGradient id="sakuraBackGlow" cx="50%" cy="40%" r="50%">
+                            <stop offset="0%" stopColor="#ff758c" stopOpacity="0.4" />
+                            <stop offset="100%" stopColor="#ff758c" stopOpacity="0" />
+                          </radialGradient>
+
+                          {/* Gradient for Flower Petals */}
+                          <linearGradient id="petalPinkGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stopColor="#ff8da1" />
+                            <stop offset="50%" stopColor="#ff6b8b" />
+                            <stop offset="100%" stopColor="#ff4b72" />
+                          </linearGradient>
+                          <linearGradient id="petalHighlight" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#ffaec0" />
+                            <stop offset="100%" stopColor="#ff758c" />
+                          </linearGradient>
+
+                          {/* Flower Center Golden Warmth */}
+                          <radialGradient id="goldCenterGrad" cx="40%" cy="40%" r="50%">
+                            <stop offset="0%" stopColor="#fff9c4" />
+                            <stop offset="60%" stopColor="#ffd54f" />
+                            <stop offset="100%" stopColor="#ffb300" />
+                          </radialGradient>
+
+                          {/* Natural Leaf Gradients */}
+                          <linearGradient id="stemNatural" x1="0%" y1="100%" x2="0%" y2="0%">
+                            <stop offset="0%" stopColor="#2e7d32" />
+                            <stop offset="100%" stopColor="#43a047" />
+                          </linearGradient>
+                          <linearGradient id="leafNatural" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#81c784" />
+                            <stop offset="100%" stopColor="#388e3c" />
+                          </linearGradient>
+                        </defs>
+
+                        {/* Ambient glow behind flower head */}
+                        <circle cx="100" cy="72" r="55" fill="url(#sakuraBackGlow)" />
+
+                        {/* Main Stem (extends all the way down into pot) */}
+                        <path d="M 100 195 Q 96 140 100 75" stroke="url(#stemNatural)" strokeWidth="8" strokeLinecap="round" fill="none" />
+
+                        {/* Left Leaf Branch & Heart-Shaped Leaf */}
+                        <path d="M 98 135 Q 75 130 60 120" stroke="url(#stemNatural)" strokeWidth="5" strokeLinecap="round" fill="none" />
+                        <g transform="translate(42, 95) rotate(-30)">
+                          {/* Heart shaped leaf */}
+                          <path d="M 15 25 C 0 10 5 -5 20 5 C 35 -5 40 10 25 25 L 20 30 Z" fill="url(#leafNatural)" filter="drop-shadow(0 2px 4px rgba(46,125,50,0.2))" />
+                          <path d="M 20 5 L 20 28" stroke="#a5d6a7" strokeWidth="1.5" strokeLinecap="round" opacity="0.7" />
+                        </g>
+
+                        {/* Right Leaf Branch & Heart-Shaped Leaf */}
+                        <path d="M 100 120 Q 125 115 140 105" stroke="url(#stemNatural)" strokeWidth="5" strokeLinecap="round" fill="none" />
+                        <g transform="translate(132, 80) rotate(35)">
+                          {/* Heart shaped leaf */}
+                          <path d="M 15 25 C 0 10 5 -5 20 5 C 35 -5 40 10 25 25 L 20 30 Z" fill="url(#leafNatural)" filter="drop-shadow(0 2px 4px rgba(46,125,50,0.2))" />
+                          <path d="M 20 5 L 20 28" stroke="#a5d6a7" strokeWidth="1.5" strokeLinecap="round" opacity="0.7" />
+                        </g>
+
+                        {/* Flower Head Group: Center at (100, 72) */}
+                        <g transform="translate(100, 72)">
+                          {/* 5 Petals spaced evenly at 72 degrees each */}
+                          {[0, 72, 144, 216, 288].map((angle, idx) => (
+                            <g key={angle} transform={`rotate(${angle})`}>
+                              {/* Soft rounded heart petal */}
+                              <path
+                                d="M 0 0 C -22 -18 -26 -44 -12 -52 C 2 -60 0 -45 0 -40 C 0 -45 -2 -60 12 -52 C 26 -44 22 -18 0 0 Z"
+                                fill={idx % 2 === 0 ? "url(#petalPinkGrad)" : "url(#petalHighlight)"}
+                                stroke="rgba(255,255,255,0.4)"
+                                strokeWidth="0.8"
+                                filter="drop-shadow(0 2px 6px rgba(255,75,114,0.3))"
+                              />
+                            </g>
+                          ))}
+
+                          {/* Inner Decorative Flower Glow */}
+                          <circle cx="0" cy="0" r="16" fill="url(#goldCenterGrad)" filter="drop-shadow(0 0 8px rgba(255,213,79,0.9))" />
+                          <circle cx="0" cy="0" r="12" fill="#ffe082" />
+                          
+                          {/* Tiny Sweet Heart at Center */}
+                          <path
+                            d="M 0 -3 C -2 -7 -6 -7 -5 -3 C -4 1 0 5 0 5 C 0 5 4 1 5 -3 C 6 -7 2 -7 0 -3 Z"
+                            fill="#e91e63"
+                          />
+
+                          {/* 5 Tiny Golden Pollen Sparkle Dots */}
+                          {[36, 108, 180, 252, 324].map((ang) => {
+                            const rad = (ang * Math.PI) / 180;
+                            const px = Math.cos(rad) * 11;
+                            const py = Math.sin(rad) * 11;
+                            return <circle key={ang} cx={px} cy={py} r="1.5" fill="#fff" opacity="0.9" />;
+                          })}
+                        </g>
+                      </svg>
+                    </motion.div>
+                  )}
+                </div>
+
+                {/* Aesthetic Ceramic Plant Pot */}
+                <div className="plant-pot-wrapper">
+                  <div className="pot-rim"></div>
+                  <div className="pot-body">
+                    <div className="pot-couple-tag">TIM & PUM 💕</div>
+                  </div>
+                  <div className="pot-shadow"></div>
+                </div>
+              </div>
+
+              {/* Plant Info Card */}
+              <div className="plant-status-card">
+                <div className="stage-title-row">
+                  <span className="stage-tag">ระดับ {getPlantStage(waterCount).stage}/5</span>
+                  <h3 className="stage-name">{getPlantStage(waterCount).name}</h3>
+                </div>
+                <p className="stage-desc">{getPlantStage(waterCount).desc}</p>
+                
+                {/* Progress bar */}
+                <div className="plant-progress-bar-bg">
+                  <div 
+                    className="plant-progress-bar-fill"
+                    style={{ width: `${getPlantStage(waterCount).percent}%` }}
+                  ></div>
+                </div>
+
+                <div className="water-stats-row">
+                  <span>💧 รดน้ำความรักไปแล้ว: <strong>{waterCount} ครั้ง</strong></span>
+                </div>
+              </div>
+            </div>
+
+            {/* Interactive Love Message Box */}
+            <AnimatePresence mode="wait">
+              {gardenMessage && (
+                <motion.div 
+                  key={gardenMessage}
+                  className="garden-note-card"
+                  initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                >
+                  <p className="garden-note-text">“ {gardenMessage} ”</p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Action Buttons */}
+            <div className="garden-actions">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={`btn-water-love ${isWatering ? 'active' : ''}`}
+                onClick={handleWaterPlant}
+                disabled={isWatering}
+              >
+                <Droplets size={22} className={isWatering ? 'animate-bounce' : ''} />
+                <span>{isWatering ? 'กำลังรดน้ำความรัก...' : 'รดน้ำความรัก 💧'}</span>
+              </motion.button>
+
+              <button 
+                className="btn-garden-reset"
+                title="เริ่มปลูกใหม่"
+                onClick={() => {
+                  if (window.confirm("คุณต้องการเริ่มดูแลต้นไม้นี้ใหม่ตั้งแต่เมล็ดพันธุ์มั้ยคับ? 🥺🌱")) {
+                    setWaterCount(0);
+                    localStorage.setItem('love_garden_water_count', '0');
+                    setGardenMessage("เริ่มปลูกต้นไม้ต้นใหม่แห่งความรักแล้วนะ 🌱");
+                  }
+                }}
+              >
+                <RefreshCw size={14} /> เริ่มปลูกใหม่
+              </button>
             </div>
           </div>
         </motion.div>
