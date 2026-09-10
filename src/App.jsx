@@ -2,8 +2,9 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import quotesData from './data/quotes.json';
-import { Camera, Trash2, Send, Clock, User, Loader2, Download, X, Play, Pause, Heart, Sprout, Sparkles, Droplets, Sun, RefreshCw } from 'lucide-react';
+import { Camera, Trash2, Send, Clock, User, Loader2, Download, X, Play, Pause, Heart, Sprout, Sparkles, Droplets, Sun, RefreshCw, Gift } from 'lucide-react';
 import { supabase } from './supabaseClient';
+import MysteryBox from './components/MysteryBox';
 
 const surpriseVideos = [
   {
@@ -914,6 +915,9 @@ function App() {
               </button>
 
               <div className="button-group-vertical" style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', marginTop: '15px' }}>
+                <button className="btn-mystery-box-main" onClick={() => setCurrentPage('mystery-box')} style={{ margin: 0 }}>
+                  <Gift size={18} style={{ marginRight: '6px' }} /> กล่องสุ่มของขวัญพิเศษ (2 กล่อง) 🎁✨
+                </button>
                 <button className="btn-garden" onClick={() => setCurrentPage('garden')} style={{ margin: 0 }}>
                   <Sprout size={18} style={{ marginRight: '6px' }} /> สวนความรัก 5 เดือน 🪴
                 </button>
@@ -1462,6 +1466,11 @@ function App() {
             </div>
           </div>
         </motion.div>
+      )}
+
+      {/* MYSTERY BOX PAGE */}
+      {currentPage === 'mystery-box' && (
+        <MysteryBox onBack={() => setCurrentPage('home')} />
       )}
 
       {currentPage === 'heart-page' && (
