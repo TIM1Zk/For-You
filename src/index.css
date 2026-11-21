@@ -3647,3 +3647,44 @@ body {
   background: linear-gradient(135deg, #c084fc 0%, #f43f5e 100%) !important;
   box-shadow: 0 4px 18px rgba(192, 132, 252, 0.4) !important;
 }
+
+
+/* Note Author Input & Meta */
+.note-author-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  border: 1px solid #fda4af;
+  border-radius: 10px;
+  padding: 6px 10px;
+}
+
+.author-icon {
+  color: #ff4b72;
+}
+
+.note-author-input {
+  border: none;
+  outline: none;
+  font-family: 'Sarabun', sans-serif;
+  font-size: 0.85rem;
+  width: 100%;
+  color: #374151;
+}
+
+.user-note-card-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.user-note-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Sarabun', sans-serif;
+  font-size: 0.75rem;
+  color: #9ca3af;
+  padding-left: 12px;
+}

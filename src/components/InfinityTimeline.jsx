@@ -15,9 +15,12 @@ import {
   RotateCcw,
   BookOpen,
   Image as ImageIcon,
-  MessageCircleHeart
+  MessageCircleHeart,
+  Loader2,
+  User
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { supabase } from '../supabaseClient';
 
 const defaultTimelineMilestones = [
   {
@@ -140,6 +143,53 @@ export default function InfinityTimeline({ onBack }) {
 
   const [editingNote, setEditingNote] = useState(false);
   const [tempNoteText, setTempNoteText] = useState("");
+  const [authorName, setAuthorName] = useState(() => {
+    return localStorage.getItem('timeline_author_name') || 'ปุ้ม';
+  });
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Load notes from Supabase
+  useEffect(() => {
+    const fetchOnlineNotes = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('images')
+          .select('*')
+          .like('name', '__TIMELINE_NOTE_M%__')
+          .order('created_at', { ascending: false });
+
+        if (!error && data && data.length > 0) {
+          const notesMap = {};
+          data.forEach(item => {
+            const match = item.name.match(/__TIMELINE_NOTE_M(\d+)__/);
+            if (match && match[1]) {
+              const m = parseInt(match[1], 10);
+              if (!notesMap[m]) {
+                notesMap[m] = {
+                  text: item.url, // store note text in url
+                  author: item.timestamp?.split('|')[0] || 'ปุ้ม',
+                  time: item.timestamp?.split('|')[1] || ''
+                };
+              }
+            }
+          });
+
+          // Merge with local fallback
+          setUserNotes(prev => {
+            const merged = { ...prev };
+            Object.keys(notesMap).forEach(m => {
+              merged[m] = notesMap[m];
+            });
+            return merged;
+          });
+        }
+      } catch (err) {
+        console.log("Timeline notes loaded locally:", err);
+      }
+    };
+
+    fetchOnlineNotes();
+  }, []);
 
   const currentItem = defaultTimelineMilestones.find(m => m.month === selectedMonth) || defaultTimelineMilestones[7];
 
@@ -157,20 +207,55 @@ export default function InfinityTimeline({ onBack }) {
   };
 
   const startEditNote = () => {
-    setTempNoteText(userNotes[selectedMonth] || "");
+    const existing = userNotes[selectedMonth];
+    setTempNoteText(typeof existing === 'object' ? existing.text : (existing || ""));
     setEditingNote(true);
   };
 
-  const saveNote = () => {
-    const updated = { ...userNotes, [selectedMonth]: tempNoteText };
+  const saveNote = async () => {
+    if (!tempNoteText.trim()) return;
+
+    setIsSaving(true);
+    const nowStr = new Date().toLocaleString('th-TH', {
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    const noteObj = {
+      text: tempNoteText.trim(),
+      author: authorName.trim() || 'เธอที่รัก',
+      time: nowStr
+    };
+
+    // 1. Save locally
+    const updated = { ...userNotes, [selectedMonth]: noteObj };
     setUserNotes(updated);
     localStorage.setItem('infinity_timeline_custom_notes', JSON.stringify(updated));
-    setEditingNote(false);
-    confetti({
-      particleCount: 15,
-      spread: 45,
-      origin: { y: 0.7 }
-    });
+    localStorage.setItem('timeline_author_name', noteObj.author);
+
+    // 2. Sync to Supabase images table
+    try {
+      const systemName = `__TIMELINE_NOTE_M${selectedMonth}__`;
+      await supabase
+        .from('images')
+        .insert([{
+          name: systemName,
+          url: noteObj.text,
+          timestamp: `${noteObj.author}|${noteObj.time}`
+        }]);
+    } catch (e) {
+      console.log("Could not sync to cloud, saved locally:", e);
+    } finally {
+      setIsSaving(false);
+      setEditingNote(false);
+      confetti({
+        particleCount: 20,
+        spread: 50,
+        origin: { y: 0.7 }
+      });
+    }
   };
 
   return (
@@ -333,6 +418,16 @@ export default function InfinityTimeline({ onBack }) {
 
               {editingNote ? (
                 <div className="note-edit-area">
+                  <div className="note-author-input-row">
+                    <User size={14} className="author-icon" />
+                    <input
+                      type="text"
+                      className="note-author-input"
+                      placeholder="ชื่อผู้เขียน (เช่น ปุ้ม, เค้าเอง)..."
+                      value={authorName}
+                      onChange={(e) => setAuthorName(e.target.value)}
+                    />
+                  </div>
                   <textarea
                     rows={3}
                     className="note-textarea"
@@ -341,10 +436,11 @@ export default function InfinityTimeline({ onBack }) {
                     onChange={(e) => setTempNoteText(e.target.value)}
                   />
                   <div className="note-btn-group">
-                    <button className="btn-save-note" onClick={saveNote}>
-                      <CheckCircle2 size={14} /> บันทึกลงแคปซูล
+                    <button className="btn-save-note" onClick={saveNote} disabled={isSaving}>
+                      {isSaving ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />} 
+                      {isSaving ? 'กำลังส่งถึงเธอ...' : 'ส่งบันทึกความรู้สึก 💌'}
                     </button>
-                    <button className="btn-cancel-note" onClick={() => setEditingNote(false)}>
+                    <button className="btn-cancel-note" onClick={() => setEditingNote(false)} disabled={isSaving}>
                       ยกเลิก
                     </button>
                   </div>
@@ -352,7 +448,17 @@ export default function InfinityTimeline({ onBack }) {
               ) : (
                 <div className="note-display-box">
                   {userNotes[selectedMonth] ? (
-                    <p className="user-note-text">“ {userNotes[selectedMonth]} ”</p>
+                    <div className="user-note-card-wrap">
+                      <p className="user-note-text">
+                        “ {typeof userNotes[selectedMonth] === 'object' ? userNotes[selectedMonth].text : userNotes[selectedMonth]} ”
+                      </p>
+                      {typeof userNotes[selectedMonth] === 'object' && userNotes[selectedMonth].author && (
+                        <div className="user-note-meta">
+                          <span>— {userNotes[selectedMonth].author}</span>
+                          {userNotes[selectedMonth].time && <span>• {userNotes[selectedMonth].time}</span>}
+                        </div>
+                      )}
+                    </div>
                   ) : (
                     <p className="user-note-empty">
                       ยังไม่มีข้อความพิเศษสำหรับเดือนนี้ แตะที่ปุ่ม <strong>"+ เขียนความรู้สึก"</strong> เพื่อบันทึกความทรงจำหวานๆ เพิ่มเติมได้เลยนะ ✍️💖
