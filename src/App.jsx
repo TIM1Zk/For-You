@@ -2,9 +2,10 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import quotesData from './data/quotes.json';
-import { Camera, Trash2, Send, Clock, User, Loader2, Download, X, Play, Pause, Heart, Sprout, Sparkles, Droplets, Sun, RefreshCw, Gift } from 'lucide-react';
+import { Camera, Trash2, Send, Clock, User, Loader2, Download, X, Play, Pause, Heart, Sprout, Sparkles, Droplets, Sun, RefreshCw, Gift, Infinity as InfinityIcon } from 'lucide-react';
 import { supabase } from './supabaseClient';
 import MysteryBox from './components/MysteryBox';
+import InfinityTimeline from './components/InfinityTimeline';
 
 const surpriseVideos = [
   {
@@ -390,10 +391,10 @@ function App() {
   const gardenLoveNotes = [
     "ต้นไม้กระซิบบอกว่า ดีใจจังที่ได้เติบโตไปพร้อมความรักของไอติมกับปุ้มนะ 🌸",
     "รดน้ำความรักเรียบร้อย! วันนี้ไอติมคิดถึงปุ้มมากๆ เลยนะคนเก่ง 💖",
-    "ดอกไม้ส่งกลิ่นหอมและกำลังใจไปให้ปุ้มอ่านหนังสือสอบแล้วนะ สู้ๆ! 📚✨",
-    "ความรักตลอด 5 เดือนของเราเบ่งบานสดใสขึ้นทุกๆ วันเลย 🌷",
+    "ดอกไม้ส่งกลิ่นหอมและกำลังใจไปให้ปุ้มเสมอ สู้ๆ นะคนดี! ✨",
+    "ความรักตลอด 8 เดือนของเราเบ่งบานสดใสขึ้นทุกๆ วันเลย 🌷",
     "ปุ้มยิ้มหน่อยน้า รอยยิ้มของคุณทำให้ต้นไม้และโลกของเค้าสดใสที่สุดเลย 🥰",
-    "5 เดือนแล้วนะ ขอบคุณที่น่ารักและคอยจับมือกันในทุกๆ วันนะคับ 🪐",
+    "8 เดือน (Infinity) แล้วนะ ขอบคุณที่น่ารักและคอยจับมือกันในทุกๆ วันนะคับ 🪐♾️",
     "ต้นไม้บอกว่า เจ้าของต้นไม้นี้ (ปุ้ม) น่ารักที่สุดในจักรวาลเลย! 🌻",
     "พลังใจ +100% ส่งตรงจากใจไอติมถึงคนดีของเค้าแล้ว ❤️"
   ];
@@ -433,8 +434,8 @@ function App() {
     if (count < 2) return { stage: 1, name: "เมล็ดพันธุ์แห่งรัก 🌱", desc: "จุดเริ่มต้นความรักที่แสนอบอุ่น", percent: Math.min(100, (count / 2) * 100) };
     if (count < 5) return { stage: 2, name: "ต้นกล้าหัวใจ 🌿", desc: "เริ่มผลิใบอ่อนรูปหัวใจทีละนิด", percent: Math.min(100, ((count - 2) / 3) * 100) };
     if (count < 9) return { stage: 3, name: "ดอกไม้ตูมแห่งความทรงจำ 🌷", desc: "เริ่มเตรียมบานรับวันครบรอบ", percent: Math.min(100, ((count - 5) / 4) * 100) };
-    if (count < 15) return { stage: 4, name: "ดอกไม้ 5 เดือนบานสะพรั่ง 🌸", desc: "ความรัก 5 เดือนที่งดงามและสดใส", percent: Math.min(100, ((count - 9) / 6) * 100) };
-    return { stage: 5, name: "สวนแห่งรักนิรันดร์ 💖✨", desc: "ความรักที่เบ่งบานเต็มหัวใจและไม่มีวันร่วงโรย", percent: 100 };
+    if (count < 15) return { stage: 4, name: "ดอกไม้ 8 เดือนบานสะพรั่ง 🌸", desc: "ความรัก 8 เดือนที่งดงามและสดใส", percent: Math.min(100, ((count - 9) / 6) * 100) };
+    return { stage: 5, name: "สวนแห่งรักนิรันดร์ (Infinity 8) 💖♾️", desc: "ความรักที่เบ่งบานเต็มหัวใจและไม่มีวันร่วงโรย", percent: 100 };
   };
 
   // HOLD HEART GAGE STATES
@@ -915,11 +916,14 @@ function App() {
               </button>
 
               <div className="button-group-vertical" style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', marginTop: '15px' }}>
+                <button className="btn-infinity-timeline" onClick={() => setCurrentPage('timeline')} style={{ margin: 0 }}>
+                  <InfinityIcon size={18} style={{ marginRight: '6px' }} /> เส้นทางความทรงจำ 8 เดือน (The Infinity Capsule) ♾️✨
+                </button>
                 <button className="btn-mystery-box-main" onClick={() => setCurrentPage('mystery-box')} style={{ margin: 0 }}>
                   <Gift size={18} style={{ marginRight: '6px' }} /> กล่องสุ่มของขวัญพิเศษ (2 กล่อง) 🎁✨
                 </button>
                 <button className="btn-garden" onClick={() => setCurrentPage('garden')} style={{ margin: 0 }}>
-                  <Sprout size={18} style={{ marginRight: '6px' }} /> สวนความรัก 5 เดือน 🪴
+                  <Sprout size={18} style={{ marginRight: '6px' }} /> สวนความรัก 8 เดือน 🪴
                 </button>
                 <button className="btn-gallery" onClick={() => setCurrentPage('gallery')} style={{ margin: 0 }}>
                   ดู Gallery ความน่ารัก 🖼️
@@ -1146,7 +1150,7 @@ function App() {
                 animate={{ y: 0, opacity: 1 }}
                 className="garden-badge"
               >
-                <Sparkles size={14} /> 5-Month Anniversary Garden
+                <Sparkles size={14} /> 8-Month Anniversary Garden
               </motion.div>
               <motion.h1 
                 className="garden-title"
@@ -1466,6 +1470,11 @@ function App() {
             </div>
           </div>
         </motion.div>
+      )}
+
+      {/* THE INFINITY TIMELINE PAGE */}
+      {currentPage === 'timeline' && (
+        <InfinityTimeline onBack={() => setCurrentPage('home')} />
       )}
 
       {/* MYSTERY BOX PAGE */}
